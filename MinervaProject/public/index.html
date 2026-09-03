@@ -1,11 +1,105 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minerva Consulting</title>
-</head>
-<body>
 
+    <!-- Fonte Poppins (Google Fonts) para dar um visual mais moderno ao site -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="icon" type="image/x-icon" href="imgs/logo.png">
+</head>
+
+<body>
+    <header>
+        <div class="logoNav">
+            <img src="imgs/logo.png" alt="Logo Minerva Consulting">
+        </div>
+
+        <nav class="indiceNav">
+            <a href="#" class="indiceEspec">Home</a>
+            <a href="#sobre-nos" class="indiceEspec">Sobre nós</a>
+            <a href="#nosso-projeto" class="indiceEspec">Nosso Projeto</a>
+            <a href="#contato" class="indiceEspec">Contate-nos</a>
+        </nav>
+
+        <div class="loginNav">
+            <button class="loginButton">Login</button>
+        </div>
+    </header>
+
+    <section id="hero-section">
+        <div class="carousel">
+            <div class="slides">
+                <img src="https://placehold.co/1000x400" class="slide active" alt="Slide 1">
+                <img src="https://placehold.co/1000x400" class="slide" alt="Slide 2">
+                <img src="https://placehold.co/1000x400" class="slide" alt="Slide 3">
+                <img src="https://placehold.co/1000x400" class="slide" alt="Slide 4">
+            </div>
+
+            <button class="seta seta-prev" aria-label="Slide anterior">&#10094;</button>
+            <button class="seta seta-next" aria-label="Próximo slide">&#10095;</button>
+
+            <div class="indicador">
+                <span class="indica active"></span>
+                <span class="indica"></span>
+                <span class="indica"></span>
+                <span class="indica"></span>
+            </div>
+        </div>
+    </section>
+
+    <section id="sobre-nos">
+        <h2 class="tituloSecao">Sobre nós</h2>
+        <div class="sobreNosTextoImg">
+            <div class="sobreNosTexto">
+                <p>Fundada em 2026, a <strong>Minerva Consulting</strong> nasceu com o propósito de unir tecnologia e educação de forma estratégica e criativa. Ajudamos instituições de ensino a transformar dados educacionais em decisões mais inteligentes, e a tecnologia em uma ferramenta real de aprendizado.</p>
+                <p>Nossa atuação é guiada por quatro pilares que moldam cada projeto que desenvolvemos: <strong>Respeito</strong>, <strong>Integridade Educacional</strong>, <strong>Criatividade</strong> e <strong>Estratégia</strong>. Mais do que valores no papel, eles são o reflexo direto da equipe que os constrói — pessoas comprometidas em gerar um impacto positivo e duradouro na educação.</p>
+            </div>
+            <img src="https://placehold.co/550x400" alt="Equipe Minerva Consulting" class="sobreNosImagem">
+        </div>
+    </section>
+
+    <section id="nosso-projeto">
+        <h2 class="tituloSecao">O Projeto Minerva</h2>
+        <div class="projetoImagemContainer">
+            <img src="https://placehold.co/1100x550" alt="Demonstração do Projeto Minerva" class="projetoImagem">
+        </div>
+    </section>
+
+    <section id="contato">
+        <h2 class="tituloSecao">Contate-nos</h2>
+        <form action="" class="formContato">
+            <div class="campoFormulario">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="email@exemplo.com" required>
+            </div>
+
+            <div class="campoFormulario">
+                <label for="assunto">Assunto</label>
+                <input type="text" id="assunto" name="assunto" placeholder="Escreva o assunto principal..." required>
+            </div>
+
+            <div class="campoFormulario">
+                <label for="mensagem">Mensagem</label>
+                <textarea id="mensagem" name="mensagem" rows="6" placeholder="Escreva sua mensagem aqui..." required></textarea>
+            </div>
+
+            <button type="submit" class="botaoEnviar">Enviar mensagem</button>
+        </form>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Minerva Consulting — Todos os direitos reservados</p>
+    </footer>
+
+    <script src="js/carousel.js"></script>
 </body>
+
 </html>
