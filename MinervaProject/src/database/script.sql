@@ -1,6 +1,15 @@
 create database projetoensinosuperior;
 use projetoensinosuperior;
 
+create table usuario (
+    idUsuario int primary key auto_increment,
+    nome varchar(100) not null,
+    sobrenome varchar(100) not null,
+    email varchar(150) not null unique,
+    senha varchar(255) not null,
+    telefone varchar(20)
+);
+
 create table localizacao (
     idLocalizacao int primary key auto_increment,
     regiao varchar(50) not null,
