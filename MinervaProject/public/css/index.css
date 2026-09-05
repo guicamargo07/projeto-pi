@@ -2,19 +2,14 @@
    VARIÁVEIS GLOBAIS DE COR E ESTILO
 =================================================================== */
 :root {
-    --cor-primaria: #142850;
-    /* Azul marinho -> transmite seriedade/confiança */
-    --cor-primaria-clara: #1F3B73;
-    /* Usado em hovers de elementos escuros */
+    --cor-primaria: #1A1A1A;
+    --cor-primaria-clara: #59534E;
     --cor-destaque: #D4A94C;
-    /* Dourado suave -> remete à sabedoria (Minerva) */
-    --cor-destaque-hover: #c49a3d;
-    --cor-fundo: #F7F8FA;
-    /* Fundo claro e neutro do corpo do site */
+    --cor-destaque-hover: #C49A3D;
+    --cor-fundo: #F8F6F2;
     --cor-texto: #2E2E2E;
-    /* Texto principal (cinza escuro, mais suave que preto puro) */
-    --cor-texto-claro: #ffffff;
-    --fonte-padrao: 'Poppins', sans-serif;
+    --cor-texto-claro: #FFFFFF;
+    --fonte-padrao: 'Arial', sans-serif;
     --sombra-padrao: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
