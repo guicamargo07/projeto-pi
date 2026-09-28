@@ -83,6 +83,23 @@ header {
     /* botão "levanta" levemente no hover */
 }
 
+.meuPerfil {
+    display: flex;
+    justify-self: end;
+    align-items: center;
+    gap: 5px;
+}
+
+.PerfilIcon {
+    display: flex;
+    align-items: center;
+}
+
+.PerfilIcon img {
+    height: 40px;
+    width: auto;
+    border-radius: 100px;
+}
 
 /* ===================================================================
    MENU DE PERFIL
