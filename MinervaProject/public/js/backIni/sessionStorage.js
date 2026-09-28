@@ -1,46 +1,105 @@
 const usuario = JSON.parse(sessionStorage.getItem('usuario'));
-//vetor com os caminhos
+
+// Vetor com os caminhos das páginas públicas
 let paginasPublicas = [
     "/index.html",
-    "/pages/login.html",
-    "/pages/filmes.html",
-    "/pages/trajes.html",
-    "/pages/cadastro.html"
+    "/pages/usuario/login.html",
+    "/pages/usuario/cadastro.html"
 ];
-// Pego o caminho atual bonitinho
+
+// Pego o caminho atual
 let paginaAtual = window.location.pathname;
 
+// Pego o header da página
+const header = document.getElementById('header');
+
 if (!usuario) {
+
     if (!paginasPublicas.includes(paginaAtual)) {
         window.location.href = "/index.html";
     }
+
 } else {
-    // if (usuario.tipoUsuario == 'A') {
-    //     quiz.innerHTML = 'Quiz';
-    //     dashboard.innerHTML = 'Dashboard';
-        login.innerHTML = 'Sair';
-        href.href = "#";
-    // } else if (usuario.tipoUsuario == 'P') {
-    //     quiz.innerHTML = 'Quiz';
-    //     dashboard.innerHTML = '';
-        login.innerHTML = 'Sair';
-        href.href = "#";
-    // }
-    console.log("teste");
+
+    header.innerHTML = `
+        <div class="logoNav">
+            <img src="imgs/logo.png" alt="Logo Minerva Consulting">
+        </div>
+
+        <nav class="indiceNav">
+            <a href="#" class="indiceEspec">Home</a>
+            <a href="#sobre-nos" class="indiceEspec">Sobre nós</a>
+            <a href="#nosso-projeto" class="indiceEspec">Nosso Projeto</a>
+            <a href="#contato" class="indiceEspec">Contate-nos</a>
+        </nav>
+
+        <div class="loginNav">
+            <div class="perfilDropdown">
+
+                <button class="perfilButton" id="perfilButton" type="button">
+                    <img 
+                        src="https://placehold.co/200x200" 
+                        alt="Foto de perfil"
+                    >
+                </button>
+
+                <div class="dropdownMenu" id="dropdownMenu">
+                    <a href="#">Configurações</a>
+                    <a href="#" id="logoutButton">Sair</a>
+                </div>
+
+            </div>
+        </div>
+    `;
+
+    // Pega os elementos que acabaram de ser criados
+    const perfilButton = document.getElementById('perfilButton');
+    const perfilDropdown = document.querySelector('.perfilDropdown');
+    const logoutButton = document.getElementById('logoutButton');
+
+    // Abre e fecha o dropdown ao clicar na foto
+    perfilButton.addEventListener('click', function (evento) {
+
+        evento.stopPropagation();
+
+        perfilDropdown.classList.toggle('aberto');
+    });
+
+    // Impede que clicar dentro do dropdown
+    // feche ele imediatamente
+    perfilDropdown.addEventListener('click', function (evento) {
+        evento.stopPropagation();
+    });
+
+    // Fecha o dropdown ao clicar fora dele
+    document.addEventListener('click', function () {
+        perfilDropdown.classList.remove('aberto');
+    });
+
+    // ================================================================
+    // BOTÃO SAIR
+    // ================================================================
+
+    logoutButton.addEventListener('click', function (evento) {
+
+        evento.preventDefault();
+
+        logout();
+    });
+
+    console.log("Header do usuário carregado.");
 }
 
+
+// ================================================================
+// FUNÇÃO DE LOGOUT
+// ================================================================
 
 function logout() {
-    sessionStorage.clear(); // apaga tudo de sessão
 
-    window.location.href = "/index.html"; // recarrega a página de maneira automatica
+    // Apaga os dados da sessão
+    sessionStorage.clear();
+
+    // Volta para a página inicial
+    window.location.href = "/index.html";
 }
-
-// Isso é um evento, ou seja, quando evento for de "click" aciona
-login.addEventListener('click', function (e) { //Sempre que clicar no login e o usuario existir, ele vai ser deslogado automatico
-    const usuario = JSON.parse(sessionStorage.getItem('usuario'));
-    if (usuario) {
-        e.preventDefault(); // Vou impedir com isso de ir para qualquer outra página
-        logout();
-    }
-});

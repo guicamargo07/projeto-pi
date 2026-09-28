@@ -82,3 +82,109 @@ header {
     transform: translateY(-2px);
     /* botão "levanta" levemente no hover */
 }
+
+
+/* ===================================================================
+   MENU DE PERFIL
+=================================================================== */
+
+/* Mantém o perfil preso no lado direito do header */
+.loginNav {
+    justify-self: end;
+}
+
+/* Container responsável por posicionar o dropdown */
+.perfilDropdown {
+    position: relative;
+}
+
+/* Botão circular que contém a foto */
+.perfilButton {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 2px solid var(--cor-destaque);
+    border-radius: 50%;
+    background-color: transparent;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.3s ease, transform 0.2s ease;
+}
+
+/* A imagem ocupa todo o círculo */
+.perfilButton img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Efeito ao passar o mouse na foto */
+.perfilButton:hover {
+    border-color: var(--cor-destaque-hover);
+    transform: scale(1.05);
+}
+
+/* ===================================================================
+   DROPDOWN
+=================================================================== */
+
+.dropdownMenu {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+
+    min-width: 180px;
+
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: var(--sombra-padrao);
+
+    overflow: hidden;
+
+    /* Escondido inicialmente */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease,
+        transform 0.2s ease;
+
+    z-index: 200;
+}
+
+/* Quando o menu estiver aberto */
+.perfilDropdown.aberto .dropdownMenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Links do dropdown */
+.dropdownMenu a {
+    display: block;
+
+    padding: 12px 18px;
+
+    color: var(--cor-texto);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+/* Hover dos itens */
+.dropdownMenu a:hover {
+    background-color: var(--cor-fundo);
+    color: var(--cor-destaque-hover);
+}
+
+/* Linha separadora entre os itens */
+.dropdownMenu a + a {
+    border-top: 1px solid #eeeeee;
+}
