@@ -82,3 +82,38 @@ header {
     transform: translateY(-2px);
     /* botão "levanta" levemente no hover */
 }
+
+.meuPerfil {
+    display: flex;
+    justify-self: end;
+    align-items: center;
+    gap: 5px;
+}
+
+.PerfilIcon{
+    display: flex;
+    align-items: center;
+}
+
+.PerfilIcon img {
+    height: 40px;
+    width: auto;
+    border-radius: 100px;
+}
+
+.perfilButton {
+    background-color: var(--cor-destaque);
+   /* color: var(--cor-primaria); */
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.perfilButton:hover {
+    background-color: var(--cor-destaque-hover);
+    transform: translateY(-2px);
+    /* botão "levanta" levemente no hover */
+}
