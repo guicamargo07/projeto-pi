@@ -150,9 +150,7 @@ header {
     position: absolute;
     top: calc(100% + 12px);
     right: 0;
-
     min-width: 180px;
-
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: var(--sombra-padrao);
@@ -168,8 +166,6 @@ header {
         opacity 0.2s ease,
         visibility 0.2s ease,
         transform 0.2s ease;
-
-    z-index: 200;
 }
 
 /* Quando o menu estiver aberto */

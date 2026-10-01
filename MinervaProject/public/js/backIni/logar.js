@@ -34,13 +34,21 @@ function logar() {
                     id: json.id,
                     email: json.email,
                     nome: json.nome,
-                    tipoUsuario: json.tipoUsuario,
-                    foto: json.fotoUsuario
+                    telefone: json.telefone,
+                    foto: json.foto,
+                    sts: json.sts
                 }))
 
-                setTimeout(function () {
-                    window.location = "../../index.html";
-                }, 1000); 
+                if (usuario.sts == 0) {
+                    sessionStorage.clear()
+                    window.location = "/pages/usuario/login.html";
+                    alert('essa conta não existe');
+                }else {
+                    setTimeout(function () {
+                        window.location = "/index.html";
+                    }, 1000);
+                }
+
 
             });
 

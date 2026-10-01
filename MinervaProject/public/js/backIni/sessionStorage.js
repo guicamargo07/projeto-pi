@@ -38,13 +38,13 @@ if (!usuario) {
 
                 <button class="perfilButton" id="perfilButton" type="button">
                     <img 
-                        src="https://placehold.co/200x200" 
+                        src="/imgs/${usuario.foto}.png"
                         alt="Foto de perfil"
                     >
                 </button>
 
                 <div class="dropdownMenu" id="dropdownMenu">
-                    <a href="#">Configurações</a>
+                    <a href="./pages/usuario/configUsu.html">Configurações</a>
                     <a href="#" id="logoutButton">Sair</a>
                 </div>
 

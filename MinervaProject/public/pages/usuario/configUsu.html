@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil</title>
+</head>
+
+<body>
+
+    <!-- Área da imagem de perfil -->
+    <section>
+        <button type="button" onclick="anterior()">Voltar</button>
+
+        <img src="#" height="200px" width="200px" id="fotoPerfil" alt="Imagem de perfil">
+
+        <button type="button" onclick="proximo()">Ir</button>
+
+        <button type="submit" onclick="salvarFoto()">Salvar foto</button>
+    </section>
+
+    <!-- Campo para editar o nome -->
+    <section id="nomeSec">
+    </section>
+
+    <!-- Campo para editar o e-mail -->
+    <section id="emailSec">
+        
+    </section>
+
+    <!-- Campo para editar o telefone -->
+    <section id="telefoneSec">
+
+    </section>
+
+    <section id="senhaSec">
+        <input type="password" id="senhaV" name="senha" placeholder="Atualize sua senha">
+        <input type="password" id="Confirmasenha" name="Confirmasenha" placeholder="confirme sua senha">
+        <button type="submit" onclick="alterarSenha()">Alterar senha</button>
+    </section>
+
+    <!-- Botão para deletar a conta -->
+    <section>
+        <button type="button" onclick="deletar()">Deletar conta</button>
+    </section>
+
+    <script src="../../js/backIni/configUsu.js"></script>
+    <script src="../../js/backIni/sessionStorage.js"></script>
+</body>
+
+</html>

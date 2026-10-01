@@ -14,18 +14,23 @@ function cadastrar() {
         confirmacaoSenhaVar == ""
     ) {
         alert('Todos os campos em branco')
+        return;
     } else if (nomeVar.length <= 1) {
         alert('Nome com um ou menos caracteres')
+        return;
     } else if (
         emailVar.indexOf('@') === -1 ||
         emailVar.indexOf('.') === -1 ||
         emailVar.indexOf('@') > emailVar.lastIndexOf('.')
     ) {
         alert('Email inválido');
-    } else if (senhaVar.length <= 6) {
-        alert('Senha com 6 ou menos digitos');
+        return;
+    } else if (senhaVar.length <= 8) {
+        alert('Senha com 8 ou menos digitos');
+        return;
     } else if (senhaVar !== confirmacaoSenhaVar) {
         alert('Não é igual a senha');
+        return;
     } else {
 
         // Enviando o valor da nova input
