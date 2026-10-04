@@ -4,35 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Cadastro</title>
+    <link rel="stylesheet" href="/css/login.css">
 </head>
 
 <body>
 
-    <h2>Cadastro</h2>
-    <p class="loginSubtitle">Bem-vindo! Cadastre-se conosco</p>
+    <div class="loginCard">
+        <img src="/imgs/M__1_-removebg-preview.png" alt="" style="height: 160px; width: auto; margin-top: -30px;">
+        <h2>Cadastro</h2>
+        <p class="loginSubtitle">Bem-vindo! Cadastre-se conosco</p>
 
-    <div class="inputGrupo">
-        <label for="inputNome">Nome</label>
-        <input type="text" id="inputNome" placeholder="Insira seu nome...">
-    </div>
+        <div class="inputGrupo">
+            <label for="inputNome">Nome</label>
+            <input type="text" id="inputNome" placeholder="Insira seu nome...">
+        </div>
 
-    <div class="inputGrupo">
-        <label for="inputEmail">Email</label>
-        <input type="email" id="inputEmail" placeholder="teste@algo.com">
-    </div>
+        <div class="inputGrupo">
+            <label for="inputEmail">Email</label>
+            <input type="email" id="inputEmail" placeholder="teste@algo.com">
+        </div>
 
-    <div class="inputGrupo">
-        <label for="inputSenha">Senha</label>
-        <input type="password" id="inputSenha" placeholder="Insira sua senha...">
-    </div>
+        <!-- Div para agrupar as senhas lado a lado -->
+        <div class="linhaCampos">
+            <div class="inputGrupo">
+                <label for="inputSenha">Senha</label>
+                <input type="password" id="inputSenha" placeholder="Insira sua senha...">
+            </div>
 
-    <div class="inputGrupo">
-        <label for="inputSenhaConfir">Confirmação de Senha</label>
-        <input type="password" id="inputSenhaConfir" placeholder="Insira sua senha novamente...">
-    </div>
+            <div class="inputGrupo">
+                <label for="inputSenhaConfir">Confirmação de Senha</label>
+                <input type="password" id="inputSenhaConfir" placeholder="Insira sua senha novamente...">
+            </div>
+        </div>
 
-    <button type="submit" class="btnEntrar" onclick="cadastrar()">Cadastrar</button>
+        <button type="submit" class="btnEntrar" onclick="cadastrar()">Cadastrar</button>
+
+        <p class="loginSubtitle">Já possui cadastro?</p>
+        <a href="./login.html" class="cadastre-se">Faça login</a>
     </div>
 
     <script src="../../js/backIni/sessionStorage.js"></script>

@@ -1,0 +1,252 @@
+:root {
+    --cor-primaria: #1A1A1A;
+    --cor-primaria-clara: #59534E;
+    --cor-destaque: #D4A94C;
+    --cor-destaque-hover: #C49A3D;
+    --cor-fundo: #F8F6F2;
+    --cor-texto: #2E2E2E;
+    --cor-texto-claro: #FFFFFF;
+    --fonte-padrao: 'Arial', sans-serif;
+    --sombra-padrao: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--fonte-padrao);
+}
+
+body {
+  background-color: var(--cor-fundo);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.loginCard {
+  background-color: var(--cor-primaria);
+  border: 1px solid var(--cor-primaria-clara);
+  border-radius: 15px;
+  width: 100%;
+  max-width: 420px;
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loginCard h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--cor-texto-claro);
+  margin-bottom: 36px;
+  text-transform: uppercase;
+  margin-bottom: -5px;
+}
+
+.inputGrupo {
+  width: 100%;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.inputGrupo label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cor-texto-claro);
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.inputGrupo input {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--cor-primaria-clara);
+  border-radius: 15px;
+  font-size: 14px;
+  color: var(--cor-texto-claro);
+  outline: none;
+  background-color: transparent;
+}
+
+.inputGrupo input:focus {
+  border-color: var(--cor-destaque-hover);
+}
+
+.senhaWrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.senhaWrapper input {
+  padding-right: 44px;
+}
+
+.btnOlho {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333333;
+}
+
+.btnOlho:focus {
+  outline: none;
+}
+
+.esqueciSenha {
+  font-size: 14px;
+  color: #c4c4c4;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  margin-top: -4px;
+  text-align: center;
+}
+
+.btnEntrar {
+  width: 100%;
+  height: 46px;
+  background-color: var(--cor-destaque);
+  color: var(--cor-texto-claro);
+  border: none;
+  border-radius: 15px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background-color 0.2s;
+  margin-top: 20px;
+}
+
+.btnEntrar:hover {
+  background-color: var(--cor-destaque-hover);
+}
+
+.loginSubtitle {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--cor-texto-claro);
+  text-align: center;
+}
+
+.cadastre-se {
+    margin-top: 10px;
+  margin-bottom: -24px;
+  font-size: 14px;
+  color: #c4c4c4;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-align: center;
+}
+
+.linhaCampos {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+.linhaCampos .inputGrupo {
+    flex: 1;
+}
+
+@media (max-width: 480px) {
+    .linhaCampos {
+        flex-direction: column;
+        gap: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 16px;
+    }
+
+    .loginCard {
+        padding: 32px 24px;
+        border-radius: 12px;
+    }
+
+    .loginCard img {
+        height: 120px;
+        margin-top: -15px;
+    }
+
+    .loginCard h2 {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .linhaCampos {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .inputGrupo {
+        margin-bottom: 16px;
+    }
+
+    .inputGrupo label {
+        font-size: 12px;
+    }
+
+    .inputGrupo input {
+        height: 40px;
+        font-size: 13px;
+    }
+
+    .btnEntrar {
+        height: 44px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 360px) {
+    .loginCard {
+        padding: 24px 16px;
+    }
+
+    .loginCard img {
+        height: 90px;
+        margin-top: -10px;
+    }
+
+    .loginCard h2 {
+        font-size: 18px;
+    }
+
+    .loginSubtitle {
+        font-size: 12px;
+        margin-bottom: 18px;
+    }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+    body {
+        align-items: flex-start;
+        padding: 20px 10px;
+    }
+
+    .loginCard {
+        padding: 24px 32px;
+    }
+
+    .loginCard img {
+        height: 80px;
+        margin-top: 0;
+    }
+}
