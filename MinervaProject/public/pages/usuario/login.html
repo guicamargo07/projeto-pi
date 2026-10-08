@@ -4,27 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/login.css">
 </head>
 
 <body>
     <div class="loginCard">
+        <img src="/imgs/M__1_-removebg-preview.png" alt="" style="height: 160px; width: auto; margin-top: -30px;">
         <h2>Login</h2>
         <p class="loginSubtitle">Bem-vindo de volta!</p>
 
         <div class="inputGrupo">
             <label for="inputEmail">Email</label>
-            <input type="email" id="inputEmail" placeholder="teste@algo.com">
+            <input type="email" id="inputEmail" placeholder="seuemail@algo.com">
         </div>
 
         <div class="inputGrupo">
             <label for="inputSenha">Senha</label>
-            <input type="password" id="inputSenha" placeholder="Insira sua senha...">
+            <input type="password" id="inputSenha" placeholder="********">
         </div>
 
-        <a href="./cadastro.html" class="cadastre-se">Não tem uma conta? Cadastre-se</a>
+        <a href="#" class="esqueciSenha">Esqueci minha senha</a>
 
         <button type="submit" class="btnEntrar" onclick="logar()">Entrar</button>
+
+        <p class="loginSubtitle">Ainda não possui uma conta?</p>
+        <a href="./cadastro.html" class="cadastre-se">Criar cadastro</a>
     </div>
 
     <script src="../../js/backIni/logar.js"></script>
