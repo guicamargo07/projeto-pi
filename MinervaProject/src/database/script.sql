@@ -1,67 +1,68 @@
-create database projetoensinosuperior;
-use projetoensinosuperior;
+CREATE DATABASE MinervaDB;
+USE MinervaDB;
 
-create table usuario (
-    idUsuario int primary key auto_increment,
-    nome varchar(100) not null,
-    sobrenome varchar(100) not null,
-    email varchar(150) not null unique,
-    senha varchar(255) not null,
-    telefone varchar(20)
+CREATE TABLE usuario (
+    idUsuario INT PRIMARY KEY auto_increment,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    foto CHAR(1) DEFAULT 'a',
+    telefone VARCHAR(20),
+    sts TINYINT DEFAULT '1'
 );
 
-create table localizacao (
-    idLocalizacao int primary key auto_increment,
-    regiao varchar(50) not null,
-    uf char(2) not null,
-    municipio varchar(100) not null
+CREATE TABLE localizacao (
+    idLocalizacao INT PRIMARY KEY auto_increment,
+    regiao VARCHAR(50) NOT NULL,
+    uf CHAR(2) NOT NULL,
+    municipio VARCHAR(100) NOT NULL
 );
 
-create table instituicao (
-    idInstituicao int primary key auto_increment,
-    codigoIes int not null,
-    nomeIes varchar(200) not null,
-    redeEnsino int not null,
-    categoriaAdministrativa varchar(100) not null,
-    organizacaoAcademica varchar(100) not null,
-    nivelAcademico int not null,
-    fkLocalizacao int,
-    constraint fk_localizacao
-        foreign key (fkLocalizacao) references localizacao(idLocalizacao)
+CREATE TABLE instituicao (
+    idInstituicao INT PRIMARY KEY auto_increment,
+    codigoIes INT NOT NULL,
+    nomeIes VARCHAR(200) NOT NULL,
+    redeEnsino INT NOT NULL,
+    categoriaAdministrativa VARCHAR(100) NOT NULL,
+    organizacaoAcademica VARCHAR(100) NOT NULL,
+    nivelAcademico INT NOT NULL,
+    fkLocalizacao INT,
+    CONSTRAINT fk_localizacao
+        FOREIGN KEY (fkLocalizacao) REFERENCES localizacao(idLocalizacao)
 );
 
-create table curso (
-    idCurso int primary key auto_increment,
-    codigoCurso int not null,
-    nomeCurso varchar(200) not null,
-    areaGeral varchar(150),
-    areaEspecifica varchar(150),
-    grauAcademico varchar(100),
-    modalidadeEnsino int not null,
-    fkInstituicao int,
-    constraint fk_instituicao
-        foreign key (fkInstituicao) references instituicao(idInstituicao)
+CREATE TABLE curso (
+    idCurso INT PRIMARY KEY auto_increment,
+    codigoCurso INT NOT NULL,
+    nomeCurso VARCHAR(200) NOT NULL,
+    areaGeral VARCHAR(150),
+    areaEspecifica VARCHAR(150),
+    grauAcademico VARCHAR(100),
+    modalidadeEnsino INT NOT NULL,
+    fkInstituicao INT,
+    CONSTRAINT fk_instituicao
+        FOREIGN KEY (fkInstituicao) REFERENCES instituicao(idInstituicao)
 );
 
-create table dadosCurso (
-    idDadosCurso int primary key auto_increment,
-    anoCenso int not null,
-    vagasOfertadas int,
-    inscritos int,
-    ingressantes int,
-    matriculas int,
-    concluintes int,
-    matriculas0a17 int,
-    matriculas18a24 int,
-    matriculas25a29 int,
-    matriculas30a34 int,
-    matriculas35a39 int,
-    matriculas40a49 int,
-    matriculas50a59 int,
-    matriculas60Mais int,
-    matriculasFemininas int,
-    matriculasMasculinas int,
-    fkCurso int,
-    constraint fk_curso
-        foreign key (fkCurso) references curso(idCurso)
+CREATE TABLE dadosCurso (
+    idDadosCurso INT PRIMARY KEY auto_increment,
+    anoCenso INT NOT NULL,
+    vagasOfertadas INT,
+    inscritos INT,
+    ingressantes INT,
+    matriculas INT,
+    concluintes INT,
+    matriculas0a17 INT,
+    matriculas18a24 INT,
+    matriculas25a29 INT,
+    matriculas30a34 INT,
+    matriculas35a39 INT,
+    matriculas40a49 INT,
+    matriculas50a59 INT,
+    matriculas60Mais INT,
+    matriculasFemininas INT,
+    matriculasMasculinas INT,
+    fkCurso INT,
+    CONSTRAINT fk_curso
+        FOREIGN KEY (fkCurso) REFERENCES curso(idCurso)
 );
