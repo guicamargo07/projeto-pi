@@ -36,7 +36,6 @@ CREATE TABLE curso (
     codigoCurso INT NOT NULL,
     nomeCurso VARCHAR(200) NOT NULL,
     areaGeral VARCHAR(150),
-    areaEspecifica VARCHAR(150),
     grauAcademico VARCHAR(100),
     modalidadeEnsino INT NOT NULL,
     fkInstituicao INT,
@@ -139,3 +138,19 @@ CREATE TABLE dashExpansao (
     CONSTRAINT fk_dashexpansao_curso
         FOREIGN KEY (fkCurso) REFERENCES curso(idCurso)
 );
+
+SELECT l.municipio,
+       i.codigoIes,
+       c.areaGeral,
+       c.modalidadeEnsino,
+       d.anoCenso,
+       d.vagasOfertadas,
+       d.inscritos,
+       d.ingressantes,
+       d.matriculas,
+       d.concluintes
+FROM dadosCurso d
+JOIN curso c        ON c.idCurso = d.fkCurso
+JOIN instituicao i  ON i.idInstituicao = c.fkInstituicao
+JOIN localizacao l  ON l.idLocalizacao = i.fkLocalizacao
+LIMIT 1000;
