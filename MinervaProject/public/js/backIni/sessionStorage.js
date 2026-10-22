@@ -23,7 +23,7 @@ if (!usuario) {
 
     header.innerHTML = `
         <div class="logoNav">
-            <img src="imgs/logo.png" alt="Logo Minerva Consulting">
+            <img src="imgs/M__2_-removebg-preview.png" alt="Logo Minerva Consulting">
         </div>
 
         <nav class="indiceNav">
