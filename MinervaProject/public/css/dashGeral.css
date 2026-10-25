@@ -1,0 +1,232 @@
+:root {
+  --cinza-menu: #666666;
+  --cinza-menu-ativo: #8a8a8a;
+  --cinza-borda: #888888;
+  --cinza-texto: #808080;
+  --azul: #0097b2;
+  --verde: #00b050;
+  --amarelo: #f2b800;
+  --vermelho: #e02020;
+  --preto: #000000;
+  --branco: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 14px; /* base menor = tudo (rem) encolhe de uma vez */
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  color: var(--preto);
+  background: var(--branco);
+}
+
+.icone {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icone--grande {
+  width: 28px;
+  height: 28px;
+}
+
+/* ===== MENU LATERAL ===== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 195px;
+  height: 100vh;
+  background: var(--cinza-menu);
+  color: var(--branco);
+  overflow-y: auto;
+}
+
+.sidebar__logo {
+  display: block;
+  width: 110px;              /* proporcional à largura do menu */
+  max-width: 60%;
+  height: auto;
+  margin: 28px auto 32px;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--branco);
+  text-decoration: none;
+}
+
+.menu__item--principal {
+  padding: 14px 22px;
+  font-size: 1rem;
+}
+
+.menu__item--sub {
+  padding: 9px 22px 9px 54px;
+  font-size: 0.8rem;
+}
+
+.menu__item--ativo {
+  background: var(--cinza-menu-ativo);
+}
+
+/* ===== CONTEÚDO ===== */
+.conteudo {
+  margin-left: 195px;
+}
+
+.topo {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 28px;
+  border-bottom: 2px solid #d0d0d0;
+}
+
+.topo__perfil {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--preto);
+  text-decoration: none;
+}
+
+.principal {
+  padding: 22px 32px 28px;
+}
+
+.titulo {
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.subtitulo {
+  font-size: 1.5rem;
+  margin-bottom: 18px;
+}
+
+/* ===== KPIs ===== */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-bottom: 20px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 118px;
+  padding: 10px;
+  border: 2px solid var(--cinza-borda);
+  border-radius: 5px;
+  text-align: center;
+}
+
+.card__rotulo {
+  font-size: 0.75rem;
+}
+
+.card__valor {
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--cinza-texto);   /* cor padrão até o JS definir */
+}
+.card__valor--menor { font-size: 2.1rem; }
+.card__valor--verde { color: var(--verde); }
+.card__valor--azul  { color: var(--azul); }
+.card__valor--vermelho { color: var(--vermelho); }
+.card__valor--amarelo  { color: var(--amarelo); }
+
+.card__detalhe {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--cinza-texto);
+}
+
+/* ===== GRÁFICO ===== */
+.grafico__titulo {
+  font-size: 0.95rem;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+
+.grafico {
+  /* ocupa o que sobra da altura da tela, com mínimo e máximo */
+  height: clamp(260px, calc(100vh - 340px), 480px);
+  padding: 14px;
+  border: 2px solid var(--cinza-borda);
+  border-radius: 5px;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+
+/* Tablet */
+@media (max-width: 1000px) {
+  .sidebar { width: 170px; }
+  .conteudo { margin-left: 170px; }
+  .principal { padding: 20px 22px 26px; }
+  .cards { gap: 14px; }
+  .card__valor { font-size: 2.2rem; }
+  .card__valor--menor { font-size: 1.7rem; }
+}
+
+/* Cards em coluna */
+@media (max-width: 800px) {
+  .cards { grid-template-columns: 1fr; }
+  .card { min-height: 100px; }
+  .grafico { height: 320px; }
+}
+
+/* Celular: menu vira barra no topo */
+@media (max-width: 700px) {
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 6px;
+  }
+  .sidebar__logo { width: 90px; margin: 14px auto 10px; }
+
+  .menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+  .menu__item--principal { padding: 10px 14px; font-size: 0.9rem; }
+  .menu__item--sub { padding: 10px 12px; font-size: 0.8rem; }
+
+  .conteudo { margin-left: 0; }
+  .topo { padding: 8px 16px; }
+  .principal { padding: 16px; }
+  .titulo { font-size: 1.4rem; }
+  .subtitulo { font-size: 1.15rem; }
+  .grafico { height: 280px; padding: 8px; }
+}
