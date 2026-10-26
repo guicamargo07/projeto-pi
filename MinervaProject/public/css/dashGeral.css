@@ -1,13 +1,17 @@
 :root {
-  --cinza-menu: #666666;
-  --cinza-menu-ativo: #8a8a8a;
-  --cinza-borda: #888888;
-  --cinza-texto: #808080;
-  --azul: #0097b2;
-  --verde: #00b050;
-  --amarelo: #f2b800;
-  --vermelho: #e02020;
-  --preto: #000000;
+  --cor-primaria: #1A1A1A;          
+  --cor-primaria-clara: #59534E;    
+  --cor-destaque: #D4A94C;          
+  --cor-destaque-hover: #C49A3D;
+  --cor-fundo: #F8F6F2;             
+  --cor-superficie: #FFFFFF;        
+  --cor-texto: #2E2E2E;
+  --cor-texto-claro: #FFFFFF;
+  --cor-borda: #E4DFD7;             
+  --sombra-padrao: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --status-bom: #3F7355;
+  --status-alerta: #C98A1B;
+  --status-ruim: #A63D3D;
   --branco: #ffffff;
 }
 
@@ -23,8 +27,8 @@ html {
 
 body {
   font-family: "Montserrat", sans-serif;
-  color: var(--preto);
-  background: var(--branco);
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
 }
 
 .icone {
@@ -49,17 +53,18 @@ body {
   left: 0;
   width: 195px;
   height: 100vh;
-  background: var(--cinza-menu);
+  background: var(--cor-primaria);
   color: var(--branco);
   overflow-y: auto;
 }
 
 .sidebar__logo {
   display: block;
-  width: 110px;              /* proporcional à largura do menu */
+  width: 110px;
   max-width: 60%;
   height: auto;
   margin: 28px auto 32px;
+  filter: brightness(0) invert(1);
 }
 
 .menu {
@@ -86,7 +91,8 @@ body {
 }
 
 .menu__item--ativo {
-  background: var(--cinza-menu-ativo);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 4px 0 0 var(--cor-destaque);
 }
 
 /* ===== CONTEÚDO ===== */
@@ -98,7 +104,8 @@ body {
   display: flex;
   justify-content: flex-end;
   padding: 10px 28px;
-  border-bottom: 2px solid #d0d0d0;
+  background: var(--cor-superficie);
+  border-bottom: 1px solid var(--cor-borda);
 }
 
 .topo__perfil {
@@ -118,11 +125,21 @@ body {
   font-size: 1.7rem;
   font-weight: 800;
   line-height: 1.2;
+  color: var(--cor-primaria);
 }
 
 .subtitulo {
   font-size: 1.5rem;
   margin-bottom: 18px;
+  color: var(--cor-primaria-clara);
+}
+
+/* Cards e gráfico */
+.card,
+.grafico {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  box-shadow: var(--sombra-padrao);
 }
 
 /* ===== KPIs ===== */
@@ -140,31 +157,33 @@ body {
   justify-content: center;
   min-height: 118px;
   padding: 10px;
-  border: 2px solid var(--cinza-borda);
+  border: 1px solid var(--cor-borda); 
   border-radius: 5px;
   text-align: center;
 }
 
 .card__rotulo {
   font-size: 0.75rem;
+  color: var(--cor-primaria-clara); letter-spacing: 1px;
 }
 
 .card__valor {
   font-size: 2.8rem;
   font-weight: 800;
   line-height: 1.15;
-  color: var(--cinza-texto);   /* cor padrão até o JS definir */
+  color: var(--cor-primaria-clara);
 }
 .card__valor--menor { font-size: 2.1rem; }
-.card__valor--verde { color: var(--verde); }
-.card__valor--azul  { color: var(--azul); }
-.card__valor--vermelho { color: var(--vermelho); }
-.card__valor--amarelo  { color: var(--amarelo); }
+.card__valor--verde { color: var(--status-bom); }
+.card__valor--amarelo  { color: var(--status-alerta); }
+.card__valor--vermelho { color: var(--status-ruim); }
+.card__valor--azul     { color: var(--cor-primaria); } 
+
 
 .card__detalhe {
   font-size: 1.1rem;
   font-weight: 500;
-  color: var(--cinza-texto);
+  color: var(--cor-primaria-clara);
 }
 
 /* ===== GRÁFICO ===== */
@@ -178,7 +197,7 @@ body {
   /* ocupa o que sobra da altura da tela, com mínimo e máximo */
   height: clamp(260px, calc(100vh - 340px), 480px);
   padding: 14px;
-  border: 2px solid var(--cinza-borda);
+  border: 1px solid var(--cor-borda); 
   border-radius: 5px;
 }
 

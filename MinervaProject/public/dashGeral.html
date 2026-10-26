@@ -10,7 +10,6 @@
 </head>
 <body>
 
-  <!-- ========== MENU LATERAL ========== -->
   <aside class="sidebar">
     <img class="sidebar__logo" src="imgs/logo_dash.png" alt="Logo M&C">
 
@@ -20,7 +19,6 @@
         Dashboard
       </a>
 
-      <!-- Submenu do Dashboard -->
       <a href="#" class="menu__item menu__item--sub menu__item--ativo">Geral</a>
       <a href="#" class="menu__item menu__item--sub">Retenção</a>
       <a href="#" class="menu__item menu__item--sub">Expansão</a>
@@ -36,7 +34,6 @@
     </nav>
   </aside>
 
-  <!-- ========== ÁREA PRINCIPAL ========== -->
   <div class="conteudo">
 
     <header class="topo">
@@ -78,7 +75,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
-    /* ========== KPI DE OCUPAÇÃO (cor dinâmica) ========== */
     const taxaDeOcupacao = 75; // trocar pelo valor real
 
     const kpiOcupacao = document.getElementById("kpiOcupacao");
@@ -92,14 +88,11 @@
       kpiOcupacao.classList.add("card__valor--verde");
     }
 
-    /* ========== GRÁFICO ========== */
     const anos = [2019, 2020, 2021, 2022, 2023, 2024];
     const matriculas = [80000, 40000, 25000, 43000, 52000, 56000];
 
-    const azul = "#0097b2";
+    const corLinha = "#D4A94C";   
     const canvas = document.getElementById("graficoMatriculas");
-
-    // fonte menor em telas pequenas
     const tamanhoFonte = window.innerWidth <= 700 ? 11 : 14;
 
     new Chart(canvas, {
@@ -109,11 +102,12 @@
         datasets: [
           {
             data: matriculas,
-            borderColor: azul,
-            backgroundColor: azul,
+            borderColor: corLinha,
+            backgroundColor: corLinha,
             borderWidth: 4,
             pointRadius: 5,
             tension: 0
+
           }
         ]
       },
