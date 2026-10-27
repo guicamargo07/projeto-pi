@@ -31,7 +31,7 @@ function logar() {
 
             resposta.json().then(json => {
                 var dadosUsuario = {
-                    id: json[0].idUsuario,
+                    idUsuario: json[0].idUsuario,
                     email: json[0].email,
                     nome: json[0].nome,
                     telefone: json[0].telefone,
