@@ -1,8 +1,94 @@
-/* ===================================================================
-   RESET BÁSICO
-=================================================================== */
+:root {
+    --cor-primaria: #1A1A1A;
+    --cor-primaria-clara: #59534E;
+    --cor-destaque: #D4A94C;
+    --cor-destaque-hover: #C49A3D;
+    --cor-fundo: #F8F6F2;
+    --cor-superficie: #FFFFFF;
+    --cor-superficie-alternativa: #F1EFEA;
+    --cor-texto: #2E2E2E;
+    --cor-texto-claro: #FFFFFF;
+    --cor-texto-suave: #C4C4C4;
+    --cor-borda: #E4DFD7;
+    --cor-erro: #A63D3D;
+    --cor-erro-borda: #E7C9C4;
+    --cor-foco: rgba(212, 169, 76, 0.24);
+    --status-bom: #3F7355;
+    --status-alerta: #C98A1B;
+    --status-ruim: #A63D3D;
+    --fonte-padrao: 'Poppins', sans-serif;
+    --sombra-padrao: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --raio-controle: 6px;
+    --raio-card: 8px;
+    --raio-imagem: 12px;
+    --altura-controle: 44px;
+    --espaco-1: 4px;
+    --espaco-2: 8px;
+    --espaco-3: 12px;
+    --espaco-4: 16px;
+    --espaco-5: 24px;
+    --espaco-6: 32px;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    color: var(--cor-texto);
+    background: var(--cor-fundo);
+    font-family: var(--fonte-padrao);
+    line-height: 1.55;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 3px solid var(--cor-foco);
+    outline-offset: 2px;
+}
+
+/* Personalização da barra de rolagem - Chrome, Edge e Safari */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--cor-fundo);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--cor-destaque);
+    border: 2px solid var(--cor-fundo);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--cor-destaque-hover);
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--cor-destaque) var(--cor-fundo);
 }

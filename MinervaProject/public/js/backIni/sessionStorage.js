@@ -1,4 +1,4 @@
-const usuario = JSON.parse(sessionStorage.getItem('usuario'));
+const usuarioSessao = JSON.parse(sessionStorage.getItem('usuario'));
 
 // Vetor com os caminhos das páginas públicas
 let paginasPublicas = [
@@ -13,24 +13,27 @@ let paginaAtual = window.location.pathname;
 // Pego o header da página
 const header = document.getElementById('header');
 
-if (!usuario) {
+if (!usuarioSessao) {
 
     if (!paginasPublicas.includes(paginaAtual)) {
         window.location.href = "/index.html";
     }
 
-} else {
+} else if (header) {
 
     header.innerHTML = `
         <div class="logoNav">
-            <img src="imgs/M__2_-removebg-preview.png" alt="Logo Minerva Consulting">
+            <a href="/index.html" aria-label="Minerva Consulting - início">
+                <img src="/imgs/M__2_-removebg-preview.png" alt="Logo Minerva Consulting">
+            </a>
         </div>
 
         <nav class="indiceNav">
-            <a href="#" class="indiceEspec">Home</a>
-            <a href="#sobre-nos" class="indiceEspec">Sobre nós</a>
-            <a href="#nosso-projeto" class="indiceEspec">Nosso Projeto</a>
-            <a href="#contato" class="indiceEspec">Contate-nos</a>
+            <a href="/index.html" class="indiceEspec">Home</a>
+            <a href="/index.html#sobre-nos" class="indiceEspec">Sobre nós</a>
+            <a href="/index.html#nosso-projeto" class="indiceEspec">Nosso Projeto</a>
+            <a href="/index.html#contato" class="indiceEspec">Contate-nos</a>
+            <a href="/dashGeral.html" class="indiceEspec">Dashboard</a>
         </nav>
 
         <div class="loginNav">
@@ -38,13 +41,13 @@ if (!usuario) {
 
                 <button class="perfilButton" id="perfilButton" type="button">
                     <img 
-                        src="/imgs/${usuario.foto}.png"
+                        src="/imgs/${usuarioSessao.foto}.png"
                         alt="Foto de perfil"
                     >
                 </button>
 
                 <div class="dropdownMenu" id="dropdownMenu">
-                    <a href="./pages/usuario/configUsu.html">Configurações</a>
+                    <a href="/pages/usuario/configUsu.html">Configurações</a>
                     <a href="#" id="logoutButton">Sair</a>
                 </div>
 

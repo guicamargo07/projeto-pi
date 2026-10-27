@@ -9,12 +9,12 @@ const vetor = ['a', 'b', 'c', 'd'];
 
 let nome = usuario.nome;
 function alterarNome() {
-    nomeSec.innerHTML = `<input type="text" id="nomeSal" name="nome" placeholder="Digite seu nome"> <button type="submit" onclick="salvarNome()">Salvar</button>`
+    nomeSec.innerHTML = `<input class="configInput" type="text" id="nomeSal" name="nome" placeholder="Digite seu nome"> <button class="configBotao configBotao--principal" type="button" onclick="salvarNome()">Salvar</button>`
 }
 
 function salvarNome() {
     var nomeSalvo = nomeSal.value;
-    var idSalvo = usuario.id;
+    var idSalvo = usuario.idUsuario;
 
     if (nomeSalvo == "") {
         alert('nome inválido');
@@ -60,11 +60,11 @@ function salvarNome() {
 =================================================================== */
 let email = usuario.email;
 function alterarEmail() {
-    emailSec.innerHTML = `<input type="text" id="emailSal" name="email" placeholder="Digite seu email"> <button type="submit" onclick="salvarEmail()">Salvar</button>`
+    emailSec.innerHTML = `<input class="configInput" type="text" id="emailSal" name="email" placeholder="Digite seu email"> <button class="configBotao configBotao--principal" type="button" onclick="salvarEmail()">Salvar</button>`
 }
 function salvarEmail() {
     var emailSalvo = emailSal.value;
-    var idSalvo = usuario.id;
+    var idSalvo = usuario.idUsuario;
 
     if (emailSalvo == "") {
         alert('Email inválido');
@@ -150,7 +150,7 @@ function aplicarMascaraTelefone(valor) {
 
 function alterarTelefone() {
     telefoneSec.innerHTML = `
-        <input 
+        <input class="configInput"
             type="tel" 
             id="telefoneSal" 
             name="telefone" 
@@ -158,7 +158,7 @@ function alterarTelefone() {
             maxlength="15" 
             required
         />
-        <button type="submit" onclick="salvarTelefone()">Salvar</button>
+        <button class="configBotao configBotao--principal" type="button" onclick="salvarTelefone()">Salvar</button>
     `;
 
     document.getElementById("telefoneSal").addEventListener("input", function () {
@@ -168,7 +168,7 @@ function alterarTelefone() {
 
 function salvarTelefone() {
     var telefoneSalvo = telefoneSal.value;
-    var idSalvo = usuario.id;
+    var idSalvo = usuario.idUsuario;
 
     fetch("/usuarios/salvarTelefone", {
         method: "POST",
@@ -239,7 +239,7 @@ function anterior() {
 
 function salvarFoto() {
     var fotoSalva = foto;
-    var idSalvo = usuario.id;
+    var idSalvo = usuario.idUsuario;
 
     fetch("/usuarios/salvarFoto", {
         method: "POST",
@@ -276,14 +276,14 @@ function salvarFoto() {
     return false;
 }
 
-nomeSec.innerHTML = `${nome} <button type="submit" onclick="alterarNome()">Alterar nome cadastrado</button>`;
-telefoneSec.innerHTML = `${telefone} <button type="submit" onclick="alterarTelefone()">Alterar telefone cadastrado</button>`;
-emailSec.innerHTML = `${email} <button type="submit" onclick="alterarEmail()">Alterar email cadastrado</button>`;
+nomeSec.innerHTML = `<span class="configCampo__valor">${nome}</span><button class="configBotao configBotao--secundario" type="button" onclick="alterarNome()">Alterar nome cadastrado</button>`;
+telefoneSec.innerHTML = `<span class="configCampo__valor">${telefone}</span><button class="configBotao configBotao--secundario" type="button" onclick="alterarTelefone()">Alterar telefone cadastrado</button>`;
+emailSec.innerHTML = `<span class="configCampo__valor">${email}</span><button class="configBotao configBotao--secundario" type="button" onclick="alterarEmail()">Alterar e-mail cadastrado</button>`;
 
 function alterarSenha() {
     var senha = senhaV.value;
     var confirma = Confirmasenha.value
-    var idSalvo = usuario.id;
+    var idSalvo = usuario.idUsuario;
     if (senha.length <= 8) {
         alert('Senha com 8 ou menos digitos');
         return;
@@ -326,7 +326,7 @@ function alterarSenha() {
 }
 
 function deletar() {
-    var idSalvo = usuario.id;
+    var idSalvo = usuario.idUsuario;
     fetch("/usuarios/deletarConta", {
         method: "POST",
         headers: {
