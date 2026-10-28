@@ -1,37 +1,4 @@
 /* ===================================================================
-   VARIÁVEIS GLOBAIS DE COR E ESTILO
-=================================================================== */
-:root {
-    --cor-primaria: #1A1A1A;
-    --cor-primaria-clara: #59534E;
-    --cor-destaque: #D4A94C;
-    --cor-destaque-hover: #C49A3D;
-    --cor-fundo: #F8F6F2;
-    --cor-texto: #2E2E2E;
-    --cor-texto-claro: #FFFFFF;
-    --fonte-padrao: 'Arial', sans-serif;
-    --sombra-padrao: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-html {
-    scroll-behavior: smooth;
-    /* rolagem suave ao clicar nos links do menu */
-}
-
-body {
-    font-family: var(--fonte-padrao);
-    color: var(--cor-texto);
-    background-color: var(--cor-fundo);
-    line-height: 1.6;
-}
-
-img {
-    max-width: 100%;
-    display: block;
-    /* remove aquele espacinho fantasma que <img> deixa embaixo por padrão */
-}
-
-/* ===================================================================
    HERO SECTION / CAROUSEL
 =================================================================== */
 #hero-section {
@@ -129,7 +96,7 @@ img {
     top: 50%;
     transform: translateY(-50%);
     background-color: rgba(0, 0, 0, 0.35);
-    color: #fff;
+    color: var(--cor-texto-claro);
     border: none;
     width: 45px;
     height: 45px;
@@ -210,7 +177,7 @@ img {
     flex: 1;
     /* imagem ocupa a outra metade */
     max-width: 500px;
-    border-radius: 16px;
+    border-radius: var(--raio-imagem);
     box-shadow: var(--sombra-padrao);
 }
 
@@ -220,7 +187,7 @@ img {
 #nosso-projeto {
     padding: 90px 60px;
     text-align: center;
-    background-color: #EFF1F5;
+    background-color: var(--cor-superficie-alternativa);
 }
 
 .projetoImagemContainer {
@@ -231,7 +198,7 @@ img {
 .projetoImagem {
     width: 100%;
     max-width: 1100px;
-    border-radius: 16px;
+    border-radius: var(--raio-imagem);
     box-shadow: var(--sombra-padrao);
 }
 
@@ -248,9 +215,9 @@ img {
 .formContato {
     width: 100%;
     max-width: 600px;
-    background-color: #ffffff;
+    background-color: var(--cor-superficie);
     padding: 40px;
-    border-radius: 20px;
+    border-radius: var(--raio-card);
     box-shadow: var(--sombra-padrao);
     display: flex;
     flex-direction: column;
@@ -274,9 +241,8 @@ img {
 .campoFormulario input,
 .campoFormulario textarea {
     padding: 12px 14px;
-    border: 1px solid #d7d9e0;
-    border-radius: 8px;
-    font-family: var(--fonte-padrao);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-controle);
     font-size: 0.95rem;
     color: var(--cor-texto);
     transition: border-color 0.3s, box-shadow 0.3s;
@@ -289,7 +255,7 @@ img {
 .campoFormulario textarea:focus {
     outline: none;
     border-color: var(--cor-destaque);
-    box-shadow: 0 0 0 3px rgba(212, 169, 76, 0.25);
+    box-shadow: 0 0 0 3px var(--cor-foco);
 }
 
 .botaoEnviar {
@@ -297,7 +263,7 @@ img {
     color: var(--cor-texto-claro);
     border: none;
     padding: 14px;
-    border-radius: 8px;
+    border-radius: var(--raio-controle);
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;

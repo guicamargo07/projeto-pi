@@ -1,0 +1,210 @@
+/* Páginas de Suporte e Abrir chamado.
+   Usa as variáveis e componentes do dash.css (carregue o dash.css antes). */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.titulo {
+  margin-bottom: 18px;
+}
+.titulo--centro {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.principal--form {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+/* títulos de seção */
+.secao__titulo {
+  font-size: 1.15rem;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: var(--cor-primaria);
+}
+
+/* perguntas frequentes */
+.faq {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 32px 4px;
+}
+.faq li[hidden] {
+  display: none;
+}
+
+.faq__link {
+  font-size: 1.05rem;
+  color: var(--cor-primaria-clara);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.faq__link::before {
+  content: "> ";
+  text-decoration: none;
+  display: inline-block;
+}
+.faq__link:hover {
+  color: var(--cor-destaque-hover);
+}
+
+/* lista de chamados */
+.chamados {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: 5px;
+  box-shadow: var(--sombra-padrao);
+  overflow: hidden;
+}
+
+.chamado {
+  display: grid;
+  grid-template-columns: 90px 1fr 120px;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 22px;
+  color: var(--cor-primaria);
+  text-decoration: none;
+  border-bottom: 1px solid var(--cor-borda);
+  transition: background 0.2s;
+}
+.chamado:last-child {
+  border-bottom: none;
+}
+.chamado:hover {
+  background: var(--cor-fundo);
+}
+
+.chamado__numero {
+  font-weight: 700;
+}
+.chamado__assunto {
+  font-size: 1.05rem;
+}
+.chamado__status {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.chamado__status--aberto  { color: var(--status-alerta); }
+.chamado__status--fechado { color: var(--status-bom); }
+
+/* botões */
+.acoes {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 200px;
+  padding: 13px 24px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--cor-primaria);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-primaria);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.botao:hover {
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque-hover);
+}
+.botao--primario {
+  background: var(--cor-destaque);
+  border-color: var(--cor-destaque);
+}
+.botao--primario:hover {
+  background: var(--cor-destaque-hover);
+  border-color: var(--cor-destaque-hover);
+  color: var(--cor-primaria);
+}
+.botao:focus-visible,
+.faq__link:focus-visible,
+.chamado:focus-visible {
+  outline: 2px solid var(--cor-destaque);
+  outline-offset: 2px;
+}
+
+/* formulário */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form__grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form__rotulo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--cor-primaria);
+}
+
+.form__campo {
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--cor-texto);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: 5px;
+  box-shadow: var(--sombra-padrao);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form__campo:focus {
+  border-color: var(--cor-destaque);
+}
+.form__campo--texto {
+  min-height: 140px;
+  resize: vertical;
+}
+.form__campo--select {
+  cursor: pointer;
+}
+.form__campo--select:invalid {
+  color: var(--cor-primaria-clara);
+}
+
+/* responsividade */
+@media (max-width: 700px) {
+  .chamado {
+    grid-template-columns: 1fr auto;
+    row-gap: 4px;
+    padding: 14px 16px;
+  }
+  .chamado__assunto {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .botao {
+    width: 100%;
+  }
+}

@@ -31,12 +31,12 @@ function logar() {
 
             resposta.json().then(json => {
                 var dadosUsuario = {
-                    id: json[0].idUsuario,
-                    email: json[0].email,
-                    nome: json[0].nome,
-                    telefone: json[0].telefone,
-                    foto: json[0].foto,
-                    sts: json[0].sts
+                    idUsuario: json.id,
+                    email: json.email,
+                    nome: json.nome,
+                    telefone: json.telefone,
+                    foto: json.foto,
+                    sts: json.sts
                 };
 
                 sessionStorage.setItem('usuario', JSON.stringify(dadosUsuario));
