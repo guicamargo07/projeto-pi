@@ -11,6 +11,24 @@ CREATE TABLE usuario (
     sts TINYINT DEFAULT '1'
 );
 
+CREATE TABLE chamados (
+    idChamado INT PRIMARY KEY auto_increment,
+    titulo VARCHAR(150) NOT NULL,
+    descricao TEXT NOT NULL,
+    categoria VARCHAR(50) NOT NULL,          -- ex: Dúvida, Erro, Sugestão, Acesso
+    prioridade TINYINT NOT NULL DEFAULT 2,   -- 1 = Baixa, 2 = Média, 3 = Alta
+    sts TINYINT NOT NULL DEFAULT 1,          -- 1 = Aberto, 2 = Em andamento, 3 = Resolvido, 4 = Fechado
+    dtAbertura DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    dtAtualizacao DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    dtFechamento DATETIME DEFAULT NULL,
+    fkUsuario INT NOT NULL,                  -- quem abriu o chamado
+    fkResponsavel INT DEFAULT NULL,          -- quem está atendendo (vazio até alguém assumir)
+    CONSTRAINT fk_chamados_usuario
+        FOREIGN KEY (fkUsuario) REFERENCES usuario(idUsuario),
+    CONSTRAINT fk_chamados_responsavel
+        FOREIGN KEY (fkResponsavel) REFERENCES usuario(idUsuario)
+);
+
 CREATE TABLE localizacao (
     idLocalizacao INT PRIMARY KEY auto_increment,
     regiao VARCHAR(50) NOT NULL,
@@ -160,4 +178,15 @@ CREATE TABLE tb_log (
                         nivel VARCHAR(50) NOT NULL,
                         mensagem TEXT NOT NULL,
                         data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE logs (
+    idLog INT PRIMARY KEY auto_increment,
+    descricao VARCHAR(255) NOT NULL,
+    sts VARCHAR(10) NOT NULL,                      -- 'ERRO' ou 'CONCLUIDO'
+    dtRegistro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    origem VARCHAR(50),                            -- quem gerou: ex. 'LeitorExcel', 'Cadastro'
+    detalhe TEXT,                                  -- mensagem completa do erro (e.message)
+    qtdRegistros INT,                              -- quantos registros foram lidos/gravados
+    CONSTRAINT chk_logs_sts CHECK (sts IN ('ERRO', 'CONCLUIDO'))
 );
