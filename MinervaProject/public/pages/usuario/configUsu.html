@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações do perfil | Minerva Consulting</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="../../css/nav.css">
+    <link rel="stylesheet" href="../../css/configUsu.css">
+</head>
+
+<body>
+    <header id="header"></header>
+
+    <main class="configPage">
+        <section class="configIntroducao">
+            <p class="configIntroducao__sobretitulo">MINERVA CONSULTING / CONTA</p>
+            <h1>Configurações do perfil</h1>
+            <p>Gerencie seus dados pessoais e as opções de segurança da conta.</p>
+        </section>
+
+        <div class="configGrid">
+            <section id="fotoSec" class="configBloco configBloco--foto">
+                <div class="configBloco__cabecalho">
+                    <h2>Foto do perfil</h2>
+                    <p>Escolha uma imagem para identificar sua conta.</p>
+                </div>
+
+                <div class="fotoEditor">
+                    <button class="fotoEditor__controle" type="button" onclick="anterior()" aria-label="Foto anterior">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6" /></svg>
+                    </button>
+                    <img src="/imgs/perfil.png" id="fotoPerfil" alt="Imagem de perfil">
+                    <button class="fotoEditor__controle" type="button" onclick="proximo()" aria-label="Próxima foto">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6" /></svg>
+                    </button>
+                    <button class="configBotao configBotao--principal" type="button" onclick="salvarFoto()">Salvar foto</button>
+                </div>
+            </section>
+
+            <section class="configBloco">
+                <div class="configBloco__cabecalho">
+                    <h2>Nome</h2>
+                    <p>Nome associado à sua conta.</p>
+                </div>
+                <div id="nomeSec" class="configCampo"></div>
+            </section>
+
+            <section class="configBloco">
+                <div class="configBloco__cabecalho">
+                    <h2>E-mail</h2>
+                    <p>Endereço usado para acessar sua conta.</p>
+                </div>
+                <div id="emailSec" class="configCampo"></div>
+            </section>
+
+            <section class="configBloco">
+                <div class="configBloco__cabecalho">
+                    <h2>Telefone</h2>
+                    <p>Número de contato associado à sua conta.</p>
+                </div>
+                <div id="telefoneSec" class="configCampo"></div>
+            </section>
+
+            <section id="senhaSec" class="configBloco configBloco--senha">
+                <div class="configBloco__cabecalho">
+                    <h2>Senha</h2>
+                    <p>Defina uma nova senha para sua conta.</p>
+                </div>
+                <div class="configSenhaCampos">
+                    <label for="senhaV">Nova senha</label>
+                    <input class="configInput" type="password" id="senhaV" name="senha" placeholder="Digite a nova senha">
+                    <label for="Confirmasenha">Confirmar senha</label>
+                    <input class="configInput" type="password" id="Confirmasenha" name="Confirmasenha" placeholder="Digite novamente">
+                </div>
+                <button class="configBotao configBotao--principal" type="button" onclick="alterarSenha()">Alterar senha</button>
+            </section>
+
+            <section class="configBloco configBloco--perigo">
+                <div class="configBloco__cabecalho">
+                    <h2>Excluir conta</h2>
+                    <p>Essa ação remove sua conta e não pode ser desfeita.</p>
+                </div>
+                <button class="configBotao configBotao--perigo" type="button" onclick="deletar()">Deletar conta</button>
+            </section>
+        </div>
+    </main>
+
+    <script src="../../js/backIni/configUsu.js"></script>
+    <script src="../../js/backIni/sessionStorage.js"></script>
+</body>
+
+</html>

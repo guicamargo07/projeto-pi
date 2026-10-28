@@ -1,0 +1,203 @@
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--espaco-5);
+}
+
+.loginCard {
+    display: flex;
+    width: 100%;
+    max-width: 420px;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 40px;
+    border: 1px solid var(--cor-primaria-clara);
+    border-radius: var(--raio-card);
+    background: var(--cor-primaria);
+}
+
+.loginLogo {
+    width: auto;
+    height: 160px;
+    margin-top: -30px;
+    object-fit: contain;
+}
+
+.loginCard h2 {
+    margin: 0 0 -5px;
+    color: var(--cor-texto-claro);
+    font-size: 1.375rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.inputGrupo {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.inputGrupo label {
+    margin-bottom: var(--espaco-2);
+    color: var(--cor-texto-claro);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-align: left;
+}
+
+.inputGrupo input {
+    width: 100%;
+    min-height: var(--altura-controle);
+    padding: 0 12px;
+    border: 1px solid var(--cor-primaria-clara);
+    border-radius: var(--raio-controle);
+    background: transparent;
+    color: var(--cor-texto-claro);
+    font-size: 0.875rem;
+}
+
+.inputGrupo input::placeholder {
+    color: var(--cor-texto-suave);
+}
+
+.inputGrupo input:focus {
+    border-color: var(--cor-destaque);
+    outline: 2px solid var(--cor-foco);
+}
+
+.senhaWrapper {
+    position: relative;
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+.senhaWrapper input {
+    padding-right: 44px;
+}
+
+.btnOlho {
+    position: absolute;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: 0;
+    background: transparent;
+    color: var(--cor-texto-claro);
+    cursor: pointer;
+}
+
+.esqueciSenha,
+.cadastre-se {
+    color: var(--cor-texto-suave);
+    font-size: 0.875rem;
+    text-align: center;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.esqueciSenha {
+    margin-top: -4px;
+}
+
+.btnEntrar {
+    width: 100%;
+    min-height: var(--altura-controle);
+    margin-top: 20px;
+    border: 0;
+    border-radius: var(--raio-controle);
+    background: var(--cor-destaque);
+    color: var(--cor-primaria);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background-color 0.2s ease;
+}
+
+.btnEntrar:hover {
+    background: var(--cor-destaque-hover);
+}
+
+.loginSubtitle {
+    margin-top: var(--espaco-3);
+    color: var(--cor-texto-claro);
+    font-size: 0.8125rem;
+    text-align: center;
+}
+
+.cadastre-se {
+    margin-top: var(--espaco-2);
+}
+
+.linhaCampos {
+    display: flex;
+    width: 100%;
+    gap: var(--espaco-3);
+}
+
+.linhaCampos .inputGrupo {
+    flex: 1;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: var(--espaco-4);
+    }
+
+    .loginCard {
+        padding: 32px 24px;
+    }
+
+    .loginLogo {
+        height: 120px;
+        margin-top: -15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .linhaCampos {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .inputGrupo {
+        margin-bottom: var(--espaco-4);
+    }
+}
+
+@media (max-width: 360px) {
+    .loginCard {
+        padding: 24px 16px;
+    }
+
+    .loginLogo {
+        height: 90px;
+        margin-top: -10px;
+    }
+
+    .loginSubtitle {
+        margin-bottom: var(--espaco-3);
+    }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+    body {
+        align-items: flex-start;
+        padding: 20px 10px;
+    }
+
+    .loginCard {
+        padding: 24px 32px;
+    }
+
+    .loginLogo {
+        height: 80px;
+        margin-top: 0;
+    }
+}
