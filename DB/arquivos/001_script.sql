@@ -173,13 +173,6 @@ JOIN instituicao i  ON i.idInstituicao = c.fkInstituicao
 JOIN localizacao l  ON l.idLocalizacao = i.fkLocalizacao
 LIMIT 1000;
 
-CREATE TABLE tb_log (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        nivel VARCHAR(50) NOT NULL,
-                        mensagem TEXT NOT NULL,
-                        data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE logs (
     idLog INT PRIMARY KEY auto_increment,
     descricao VARCHAR(255) NOT NULL,
