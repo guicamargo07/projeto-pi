@@ -15,6 +15,7 @@ CREATE TABLE chamados (
     idChamado INT PRIMARY KEY auto_increment,
     titulo VARCHAR(150) NOT NULL,
     descricao TEXT NOT NULL,
+    detalhe TEXT NOT NULL,
     categoria VARCHAR(50) NOT NULL,          -- ex: Dúvida, Erro, Sugestão, Acesso
     prioridade TINYINT NOT NULL DEFAULT 2,   -- 1 = Baixa, 2 = Média, 3 = Alta
     sts TINYINT NOT NULL DEFAULT 1,          -- 1 = Aberto, 2 = Em andamento, 3 = Resolvido, 4 = Fechado
