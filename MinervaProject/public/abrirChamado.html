@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Abrir chamado</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dash.css">
     <link rel="stylesheet" href="css/suporte.css">
 </head>
@@ -17,6 +20,9 @@
         <a href="index.html" class="sidebar__link-logo" aria-label="Ir para a página inicial">
             <img class="sidebar__logo" src="imgs/logo_dash.png" alt="Logo M&C">
         </a>
+        <div class="sidebar__perfil">
+            <img id="fotoPerfilDashboard" class="sidebar__foto" src="/imgs/perfil.png" alt="Foto de perfil">
+        </div>
 
         <nav class="menu">
             <a href="dashGeral.html" class="menu__item menu__item--principal">
@@ -50,17 +56,6 @@
     </aside>
 
     <div class="conteudo">
-
-        <header class="topo">
-            <a href="#" class="topo__perfil">
-                <svg class="icone icone--grande" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" />
-                    <circle cx="12" cy="10" r="3.5" />
-                    <path d="M5.5 19c1.5-3 4-4 6.5-4s5 1 6.5 4" />
-                </svg>
-                Meu perfil
-            </a>
-        </header>
 
         <main class="principal principal--form">
 
@@ -99,6 +94,20 @@
         </main>
     </div>
     <script>
+        (() => {
+            const usuarioDashboard = JSON.parse(sessionStorage.getItem("usuario"));
+            const fotoPerfilDashboard = document.getElementById("fotoPerfilDashboard");
+
+            if (usuarioDashboard?.foto) {
+                fotoPerfilDashboard.src = `/imgs/${usuarioDashboard.foto}.png`;
+            }
+
+            document.getElementById("logoutDashboard")?.addEventListener("click", (evento) => {
+                evento.preventDefault();
+                logout();
+            });
+        })();
+
         document.getElementById("formChamado").addEventListener("submit", (e) => {
             e.preventDefault();
             // aqui entra o envio real dos dados ao servidor, quando existir
@@ -106,6 +115,7 @@
             window.location.href = "suporte.html";
         });
     </script>
+    <script src="js/backIni/sessionStorage.js"></script>
 </body>
 
 </html>
