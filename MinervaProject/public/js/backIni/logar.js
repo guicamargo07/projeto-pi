@@ -30,25 +30,27 @@ function logar() {
             console.log(resposta);
 
             resposta.json().then(json => {
-                sessionStorage.setItem('usuario', JSON.stringify({ // cria-se um objeto json para realizar verificação
-                    id: json.id,
+                var dadosUsuario = {
+                    idUsuario: json.id,
                     email: json.email,
                     nome: json.nome,
                     telefone: json.telefone,
                     foto: json.foto,
                     sts: json.sts
-                }))
+                };
 
-                if (usuario.sts == 0) {
+                sessionStorage.setItem('usuario', JSON.stringify(dadosUsuario));
+
+                if (dadosUsuario.sts == 0) {
                     sessionStorage.clear()
                     window.location = "/pages/usuario/login.html";
                     alert('essa conta não existe');
-                }else {
+                } else {
+                    alert('Login realizado com sucesso! Redirecionando...');
                     setTimeout(function () {
                         window.location = "/index.html";
                     }, 1000);
                 }
-
 
             });
 

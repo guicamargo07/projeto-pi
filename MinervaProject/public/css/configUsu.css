@@ -1,0 +1,303 @@
+.configPage {
+    min-height: calc(100vh - 68px);
+    width: min(1040px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 44px 0 64px;
+}
+
+.configIntroducao {
+    margin-bottom: 26px;
+}
+
+.configIntroducao__sobretitulo {
+    margin: 0 0 8px;
+    color: var(--cor-destaque-hover);
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.configIntroducao h1 {
+    margin: 0;
+    color: var(--cor-primaria);
+    font-size: 1.9rem;
+    font-weight: 700;
+}
+
+.configIntroducao > p:last-child {
+    margin: 8px 0 0;
+    color: var(--cor-primaria-clara);
+    font-size: 0.95rem;
+}
+
+.configGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.configBloco {
+    min-width: 0;
+    padding: 22px;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-card);
+    background: var(--cor-superficie);
+    color: var(--cor-primaria);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.configBloco__cabecalho p {
+    margin: 5px 0 0;
+    color: var(--cor-primaria-clara);
+    font-size: 0.82rem;
+}
+
+.fotoEditor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#fotoPerfil {
+    width: 104px;
+    height: 104px;
+    border: 3px solid var(--cor-destaque);
+    border-radius: 50%;
+    background: var(--cor-fundo);
+    object-fit: cover;
+}
+
+.fotoEditor__controle {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--cor-borda);
+    border-radius: 50%;
+    background: var(--cor-superficie);
+    color: var(--cor-primaria);
+    cursor: pointer;
+}
+
+.fotoEditor__controle:hover {
+    border-color: var(--cor-destaque);
+    color: var(--cor-destaque-hover);
+}
+
+.fotoEditor__controle svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.configCampo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.configCampo__valor {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    color: var(--cor-primaria);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.configBotao {
+    display: inline-flex;
+    min-height: var(--altura-controle);
+    align-items: center;
+    justify-content: center;
+    padding: 9px 16px;
+    border: 1px solid transparent;
+    border-radius: var(--raio-controle);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.configBotao--principal {
+    background: var(--cor-destaque);
+    color: var(--cor-primaria);
+}
+
+.configBotao--principal:hover {
+    background: var(--cor-destaque-hover);
+}
+
+.configBotao--secundario {
+    border-color: var(--cor-borda);
+    background: var(--cor-superficie);
+    color: var(--cor-primaria);
+}
+
+.configBotao--secundario:hover {
+    border-color: var(--cor-destaque);
+    background: var(--cor-fundo);
+}
+
+.configInput {
+    width: 100%;
+    min-height: var(--altura-controle);
+    padding: 10px 12px;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-controle);
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+    font: inherit;
+    font-size: 0.9rem;
+}
+
+.configInput:focus {
+    border-color: var(--cor-destaque-hover);
+    outline: 2px solid var(--cor-foco);
+}
+
+.configBloco--senha {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.configSenhaCampos {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+    margin: 16px 0;
+}
+
+.configSenhaCampos label {
+    color: var(--cor-primaria-clara);
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.configBloco--perigo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-color: var(--cor-erro-borda);
+}
+
+.configBotao--perigo {
+    flex: 0 0 auto;
+    border-color: var(--cor-erro);
+    background: var(--cor-superficie);
+    color: var(--cor-erro);
+}
+
+.configBotao--perigo:hover {
+    background: var(--cor-erro);
+    color: var(--cor-texto-claro);
+}
+
+@media (max-width: 760px) {
+    header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 10px 20px;
+    }
+
+    .indiceNav {
+        gap: 16px;
+    }
+
+    .indiceNav .indiceEspec {
+        font-size: 0.78rem;
+    }
+
+    .indiceNav .indiceEspec:nth-child(2),
+    .indiceNav .indiceEspec:nth-child(3),
+    .indiceNav .indiceEspec:nth-child(4) {
+        display: none;
+    }
+
+    .configBloco--foto {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    header {
+        gap: 10px;
+        padding: 9px 14px;
+    }
+
+    .logoNav img {
+        height: 44px;
+    }
+
+    .indiceNav {
+        gap: 10px;
+    }
+
+    .indiceNav .indiceEspec {
+        font-size: 0.72rem;
+    }
+
+    .perfilButton {
+        width: 42px;
+        height: 42px;
+    }
+
+    .configPage {
+        width: calc(100% - 28px);
+        padding: 30px 0 42px;
+    }
+
+    .configIntroducao h1 {
+        font-size: 1.55rem;
+    }
+
+    .configGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .configBloco,
+    .configBloco--foto {
+        grid-column: 1;
+        padding: 18px;
+    }
+
+    .fotoEditor {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #fotoPerfil {
+        width: 88px;
+        height: 88px;
+    }
+
+    .fotoEditor .configBotao {
+        width: 100%;
+    }
+
+    .configSenhaCampos {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .configSenhaCampos label:not(:first-child) {
+        margin-top: 8px;
+    }
+
+    .configBloco--perigo {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
