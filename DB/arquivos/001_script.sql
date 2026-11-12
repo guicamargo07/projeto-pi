@@ -2,13 +2,21 @@ CREATE DATABASE IF NOT EXISTS MinervaDB;
 USE MinervaDB;
 
 CREATE TABLE usuario (
-    idUsuario INT PRIMARY KEY auto_increment,
+    idUsuario INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
     foto CHAR(1) DEFAULT 'a',
     telefone VARCHAR(20),
-    sts TINYINT DEFAULT '1'
+    sts TINYINT DEFAULT 1,
+    perfil ENUM('ADM', 'VISUALIZADOR')
+        NOT NULL DEFAULT 'VISUALIZADOR',
+
+    fkInstituicao INT NOT NULL,
+
+    CONSTRAINT fk_usuario_instituicao
+        FOREIGN KEY (fkInstituicao)
+        REFERENCES instituicao(idInstituicao)
 );
 
 CREATE TABLE chamados (
@@ -37,7 +45,7 @@ CREATE TABLE localizacao (
 );
 
 CREATE TABLE instituicao (
-    idInstituicao INT PRIMARY KEY auto_increment,
+    idInstituicao INT PRIMARY KEY AUTO_INCREMENT,
     codigoIes INT NOT NULL,
     nomeIes VARCHAR(200) NOT NULL,
     redeEnsino INT NOT NULL,
@@ -45,8 +53,10 @@ CREATE TABLE instituicao (
     organizacaoAcademica VARCHAR(100) NOT NULL,
     nivelAcademico INT NOT NULL,
     fkLocalizacao INT,
+
     CONSTRAINT fk_localizacao
-        FOREIGN KEY (fkLocalizacao) REFERENCES localizacao(idLocalizacao)
+        FOREIGN KEY (fkLocalizacao)
+        REFERENCES localizacao(idLocalizacao)
 );
 
 CREATE TABLE curso (
