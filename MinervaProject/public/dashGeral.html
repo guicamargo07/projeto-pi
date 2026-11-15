@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/dash.css">
+  <script src="js/kpi-tooltips.js" defer></script>
 
 
 </head>
@@ -86,20 +87,52 @@
 
       <section class="cards">
         <div class="card">
-          <span class="card__rotulo">TAXA DE OCUPAÇÃO</span>
+          <div class="card__cabecalho">
+            <span class="card__rotulo">TAXA DE OCUPAÇÃO</span>
+            <span class="kpi-ajuda">
+              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculada a taxa de ocupação?" aria-describedby="tooltip-ocupacao" aria-expanded="false">?</button>
+              <span class="kpi-tooltip" id="tooltip-ocupacao" role="tooltip" hidden>
+                <strong class="kpi-tooltip__titulo">Taxa de ocupação</strong>
+                <span>Mostra o percentual das vagas ofertadas que foram preenchidas por ingressantes.</span>
+                <span class="kpi-tooltip__formula">Ingressantes ÷ Vagas ofertadas × 100.</span>
+                <span class="kpi-tooltip__exemplo">Exemplo: 400 ingressantes ÷ 2.000 vagas × 100 = 20%.</span>
+              </span>
+            </span>
+          </div>
           <!-- id adicionado: o JS troca a cor conforme o valor -->
           <strong id="kpiOcupacao" class="card__valor">75%</strong>
         </div>
 
         <div class="card">
-          <span class="card__rotulo">TAXA DE CRESCIMENTO</span>
+          <div class="card__cabecalho">
+            <span class="card__rotulo">TAXA DE CRESCIMENTO</span>
+            <span class="kpi-ajuda">
+              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculada a taxa de crescimento?" aria-describedby="tooltip-crescimento" aria-expanded="false">?</button>
+              <span class="kpi-tooltip" id="tooltip-crescimento" role="tooltip" hidden>
+                <strong class="kpi-tooltip__titulo">Taxa de crescimento</strong>
+                <span>Indica o aumento ou a redução do número de matrículas em relação ao ano anterior.</span>
+                <span class="kpi-tooltip__formula">(Matrículas do ano atual − Matrículas do ano anterior) ÷ Matrículas do ano anterior × 100.</span>
+                <span class="kpi-tooltip__exemplo">Exemplo: (11.000 − 10.000) ÷ 10.000 × 100 = 10%.</span>
+              </span>
+            </span>
+          </div>
           <strong class="card__valor card__valor--verde">▲ 4,2%</strong>
         </div>
 
         <div class="card">
-          <span class="card__rotulo">PÚBLICO PREDOMINANTE</span>
+          <div class="card__cabecalho">
+            <span class="card__rotulo">PÚBLICO PREDOMINANTE</span>
+            <span class="kpi-ajuda">
+              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculado o público predominante?" aria-describedby="tooltip-publico" aria-expanded="false">?</button>
+              <span class="kpi-tooltip" id="tooltip-publico" role="tooltip" hidden>
+                <strong class="kpi-tooltip__titulo">Público predominante</strong>
+                <span>Compara a quantidade de matrículas das oito faixas etárias e apresenta aquela com o maior número de matrículas.</span>
+                <span class="kpi-tooltip__formula">Público predominante = faixa etária com mais matrículas.</span>
+                <span class="kpi-tooltip__exemplo">São comparadas as faixas: até 17 anos, 18–24, 25–29, 30–34, 35–39, 40–49, 50–59 e 60 anos ou mais.</span>
+              </span>
+            </span>
+          </div>
           <strong class="card__valor card__valor--azul card__valor--menor">18 - 24 Anos</strong>
-          <span class="card__detalhe">(65%)</span>
         </div>
       </section>
 

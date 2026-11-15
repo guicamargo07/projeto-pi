@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/dash.css">
+  <script src="js/kpi-tooltips.js" defer></script>
 </head>
 <body>
 
@@ -66,17 +67,50 @@
 
       <section class="cards">
         <div class="card">
-          <span class="card__rotulo">TAXA DE INTERESSE</span>
+          <div class="card__cabecalho">
+            <span class="card__rotulo">TAXA DE INTERESSE</span>
+            <span class="kpi-ajuda">
+              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculada a taxa de interesse?" aria-describedby="tooltip-interesse" aria-expanded="false">?</button>
+              <span class="kpi-tooltip" id="tooltip-interesse" role="tooltip" hidden>
+                <strong class="kpi-tooltip__titulo">Taxa de interesse</strong>
+                <span>Indica a quantidade de candidatos inscritos por vaga ofertada. O resultado é um número de candidatos por vaga.</span>
+                <span class="kpi-tooltip__formula">Inscritos ÷ Vagas ofertadas.</span>
+                <span class="kpi-tooltip__exemplo">Exemplo: 21.000 inscritos ÷ 5.000 vagas = 4,2 candidatos por vaga.</span>
+              </span>
+            </span>
+          </div>
           <strong class="card__valor card__valor--azul">4,2</strong>
         </div>
 
         <div class="card">
-          <span class="card__rotulo">INSTITUIÇÕES COM OFERTA</span>
+          <div class="card__cabecalho">
+            <span class="card__rotulo">INSTITUIÇÕES COM OFERTA</span>
+            <span class="kpi-ajuda">
+              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculada a quantidade de instituições com oferta?" aria-describedby="tooltip-instituicoes" aria-expanded="false">?</button>
+              <span class="kpi-tooltip" id="tooltip-instituicoes" role="tooltip" hidden>
+                <strong class="kpi-tooltip__titulo">Instituições com oferta</strong>
+                <span>Apresenta a quantidade de instituições que ofertam cursos na região, no período e na modalidade selecionados, somando os registros filtrados.</span>
+                <span class="kpi-tooltip__formula">Soma da quantidade de instituições dos registros filtrados.</span>
+                <span class="kpi-tooltip__exemplo">Exemplo: 12 + 8 = 20 instituições.</span>
+              </span>
+            </span>
+          </div>
           <strong class="card__valor">20</strong>
         </div>
 
         <div class="card">
-          <span class="card__rotulo">TOTAL DE VAGAS</span>
+          <div class="card__cabecalho">
+            <span class="card__rotulo">TOTAL DE VAGAS</span>
+            <span class="kpi-ajuda">
+              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculado o total de vagas?" aria-describedby="tooltip-vagas" aria-expanded="false">?</button>
+              <span class="kpi-tooltip" id="tooltip-vagas" role="tooltip" hidden>
+                <strong class="kpi-tooltip__titulo">Total de vagas</strong>
+                <span>Apresenta o total de vagas ofertadas no recorte selecionado, somando as vagas de todos os registros filtrados.</span>
+                <span class="kpi-tooltip__formula">Soma das vagas ofertadas dos registros filtrados.</span>
+                <span class="kpi-tooltip__exemplo">Exemplo: 2.869 + 2.000 = 4.869 vagas.</span>
+              </span>
+            </span>
+          </div>
           <strong class="card__valor card__valor--azul">4.869</strong>
         </div>
       </section>

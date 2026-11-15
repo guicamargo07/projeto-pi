@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/dash.css">
+  <script src="js/kpi-tooltips.js" defer></script>
 </head>
 <body>
 
@@ -64,12 +65,34 @@
 
       <section class="cards cards--2">
         <div class="card">
-          <span class="card__rotulo">TAXA DE CRESCIMENTO DE CONCLUINTES</span>
+          <div class="card__cabecalho">
+            <span class="card__rotulo">TAXA DE CRESCIMENTO DE CONCLUINTES</span>
+            <span class="kpi-ajuda">
+              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculada a taxa de crescimento de concluintes?" aria-describedby="tooltip-crescimento-concluintes" aria-expanded="false">?</button>
+              <span class="kpi-tooltip" id="tooltip-crescimento-concluintes" role="tooltip" hidden>
+                <strong class="kpi-tooltip__titulo">Taxa de crescimento de concluintes</strong>
+                <span>Indica o aumento ou a redução do número de concluintes em relação ao ano anterior.</span>
+                <span class="kpi-tooltip__formula">(Concluintes do ano atual − Concluintes do ano anterior) ÷ Concluintes do ano anterior × 100.</span>
+                <span class="kpi-tooltip__exemplo">Exemplo: (5.400 − 5.000) ÷ 5.000 × 100 = 8%.</span>
+              </span>
+            </span>
+          </div>
           <strong class="card__valor card__valor--verde">▲ 8%</strong>
         </div>
 
         <div class="card card--barras">
-          <span class="card__rotulo">CONCLUSÃO POR SEGMENTO</span>
+          <div class="card__cabecalho">
+            <span class="card__rotulo">CONCLUSÃO POR SEGMENTO</span>
+            <span class="kpi-ajuda">
+              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculada a conclusão por segmento?" aria-describedby="tooltip-conclusao-segmento" aria-expanded="false">?</button>
+              <span class="kpi-tooltip" id="tooltip-conclusao-segmento" role="tooltip" hidden>
+                <strong class="kpi-tooltip__titulo">Conclusão por segmento</strong>
+                <span>Mostra a relação entre os totais de concluintes e ingressantes, calculada separadamente para as modalidades Presencial e EAD.</span>
+                <span class="kpi-tooltip__formula">Soma de concluintes ÷ Soma de ingressantes × 100, em cada modalidade.</span>
+                <span class="kpi-tooltip__exemplo">Exemplo no Presencial: 4.800 concluintes ÷ 10.000 ingressantes × 100 = 48%.</span>
+              </span>
+            </span>
+          </div>
 
           <div class="barras">
             <div class="barra">
