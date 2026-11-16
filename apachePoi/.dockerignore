@@ -1,0 +1,7 @@
+target/
+.idea/
+.git/
+.mvn/
+*.xlsx
+dependency-reduced-pom.xml
+*.iml

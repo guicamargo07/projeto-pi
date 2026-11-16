@@ -1,6 +1,8 @@
 # Imagem base do Node.js
 FROM node:22
 
+WORKDIR /app
+
 # Copia os arquivos de dependências
 COPY package*.json ./
 
