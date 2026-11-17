@@ -1,0 +1,93 @@
+name: minerva
+
+services:
+  db:
+    build: ./DB
+    image: minerva-db
+    container_name: db-minerva
+    restart: unless-stopped
+    labels:
+      minerva.managed: "true"
+    env_file:
+      - ${MINERVA_CONFIG_DIR:-/etc/minerva}/mysql.env
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - minerva-network
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          MYSQL_PWD="$${MYSQL_PASSWORD}" mysql --protocol=TCP -h127.0.0.1
+          -u"$${MYSQL_USER}" "$${MYSQL_DATABASE}"
+          -Nse 'SELECT 1 FROM logs LIMIT 1'
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
+  node:
+    build: ./MinervaProject
+    image: minerva-project
+    container_name: minerva
+    restart: unless-stopped
+    labels:
+      minerva.managed: "true"
+    env_file:
+      - ${MINERVA_CONFIG_DIR:-/etc/minerva}/node.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - minerva-network
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - >-
+          const http = require('node:http');
+          const req = http.get('http://127.0.0.1:8080/', res => {
+            res.resume();
+            process.exit(res.statusCode >= 200 && res.statusCode < 400 ? 0 : 1);
+          });
+          req.on('error', () => process.exit(1));
+          req.setTimeout(4000, () => { req.destroy(); process.exit(1); });
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  java:
+    build: ./apachePoi
+    image: minerva-java
+    profiles:
+      - jobs
+    restart: "no"
+    labels:
+      minerva.managed: "true"
+    env_file:
+      - ${MINERVA_CONFIG_DIR:-/etc/minerva}/java.env
+    volumes:
+      - type: bind
+        source: ./apachePoi/MICRODADOS_CURSOS_2019_2024_MINERVA.xlsx
+        target: /app/MICRODADOS_CURSOS_2019_2024_MINERVA.xlsx
+        read_only: true
+        bind:
+          create_host_path: false
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - minerva-network
+
+networks:
+  minerva-network:
+    name: minerva-compose-network
+
+volumes:
+  mysql-data:
+    name: minerva-mysql-data

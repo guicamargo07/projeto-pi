@@ -6,11 +6,12 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 PROJECT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT_FILE="$PROJECT_DIR/inicializar.sh"
+COMPOSE_FILE="$PROJECT_DIR/compose.yaml"
+COMPOSE_PROJECT=minerva
 CONFIG_DIR=/etc/minerva
 LOG_FILE=/var/log/minerva-apache-poi.log
 LOCK_FILE=/run/lock/minerva-java.lock
 TIMEZONE=America/Sao_Paulo
-NETWORK=minerva-network
 WORKBOOK=MICRODADOS_CURSOS_2019_2024_MINERVA.xlsx
 CRON_MARKER=MINERVA_APACHE_POI
 
@@ -21,7 +22,7 @@ falhar() {
 
 verificar_arquivos() {
     local arquivo
-    for arquivo in DB/Dockerfile DB/arquivos/001_script.sql \
+    for arquivo in compose.yaml DB/Dockerfile DB/arquivos/001_script.sql \
         MinervaProject/Dockerfile MinervaProject/package.json \
         apachePoi/Dockerfile apachePoi/pom.xml "apachePoi/$WORKBOOK"; do
         [[ -f "$PROJECT_DIR/$arquivo" ]] || falhar "Arquivo necessario ausente: $PROJECT_DIR/$arquivo"
@@ -46,6 +47,7 @@ instalar_dependencias() {
     command -v docker >/dev/null 2>&1 || pacotes+=("$docker_package")
     command -v crontab >/dev/null 2>&1 || pacotes+=("$cron_package")
     command -v flock >/dev/null 2>&1 || pacotes+=(util-linux)
+    command -v curl >/dev/null 2>&1 || pacotes+=(curl ca-certificates)
     [[ -f "/usr/share/zoneinfo/$TIMEZONE" ]] || pacotes+=(tzdata)
 
     if (( ${#pacotes[@]} > 0 )); then
@@ -64,6 +66,54 @@ instalar_dependencias() {
     fi
     sudo systemctl enable --now docker "$CRON_SERVICE"
     sudo docker info >/dev/null
+    instalar_compose
+}
+
+instalar_compose() {
+    if sudo docker compose version >/dev/null 2>&1; then
+        verificar_compose
+        return
+    fi
+    # Plugin oficial, instalado para todos os usuarios sem trocar o Docker Engine.
+    # Versao e SHA256 fixos: https://github.com/docker/compose/releases/tag/v5.6.1
+    (
+        local arquitetura checksum temporario
+        arquitetura="$(uname -m)"
+        case "$arquitetura" in
+            x86_64)
+                checksum=47737f4236e6d3ccea7291995203f8f018058783b4c3a9469119811a0b5db8c0 ;;
+            aarch64|arm64)
+                arquitetura=aarch64
+                checksum=42cfa75f51ad0ccf290bad37899e0038a8c10a0069e85233ecc1d53e3ff1347d ;;
+            *) falhar "Arquitetura nao suportada para instalar Compose: $arquitetura" ;;
+        esac
+        temporario="$(mktemp)"
+        trap 'rm -f -- "$temporario"' EXIT
+        curl --fail --show-error --location --retry 3 \
+            "https://github.com/docker/compose/releases/download/v5.6.1/docker-compose-linux-$arquitetura" \
+            --output "$temporario" || falhar 'Nao foi possivel baixar o plugin Compose.'
+        printf '%s  %s\n' "$checksum" "$temporario" | sha256sum --check --status \
+            || falhar 'O SHA256 do plugin Compose nao confere. O arquivo nao sera instalado.'
+        sudo install -d -m 755 /usr/local/lib/docker/cli-plugins
+        sudo install -m 755 "$temporario" /usr/local/lib/docker/cli-plugins/docker-compose
+    )
+    sudo docker compose version
+    verificar_compose
+}
+
+verificar_compose() {
+    local opcoes_up opcoes_run
+    opcoes_up="$(sudo docker compose up --help)"
+    opcoes_run="$(sudo docker compose run --help)"
+    [[ "$opcoes_up" == *--wait-timeout* && "$opcoes_up" == *--wait* \
+        && "$opcoes_run" == *--pull* ]] \
+        || falhar 'O plugin Compose instalado esta desatualizado. Atualize-o antes de migrar os containers; sao necessarios up --wait --wait-timeout e run --pull.'
+}
+
+compose() {
+    sudo env MINERVA_CONFIG_DIR="$CONFIG_DIR" docker compose \
+        --project-name "$COMPOSE_PROJECT" --project-directory "$PROJECT_DIR" \
+        --file "$COMPOSE_FILE" --env-file /dev/null "$@"
 }
 
 criar_configuracoes() {
@@ -111,29 +161,38 @@ EOF
 }
 
 construir_imagens() {
-    (
-        cd "$PROJECT_DIR/DB"
-        sudo docker build -t minerva-db .
-    )
-    (
-        cd "$PROJECT_DIR/MinervaProject"
-        sudo docker build -t minerva-project .
-    )
-    (
-        cd "$PROJECT_DIR/apachePoi"
-        sudo docker build -t minerva-java .
-    )
+    compose --profile jobs config --quiet
+    compose --profile jobs build db node java
 }
 
-reutilizar_container() {
-    local nome="$1" gerenciado
-    if ! sudo docker container inspect "$nome" >/dev/null 2>&1; then
-        return 1
+migrar_containers_legados() {
+    local nome projeto gerenciado volume
+    local -a legados=()
+    # Verifica todos os nomes antes de interromper qualquer servico existente.
+    for nome in db-minerva minerva; do
+        if ! sudo docker container inspect "$nome" >/dev/null 2>&1; then
+            continue
+        fi
+        projeto="$(sudo docker inspect --format '{{index .Config.Labels "com.docker.compose.project"}}' "$nome")"
+        if [[ "$projeto" == "$COMPOSE_PROJECT" ]]; then
+            continue
+        fi
+        gerenciado="$(sudo docker inspect --format '{{index .Config.Labels "minerva.managed"}}' "$nome")"
+        [[ "$gerenciado" == true && ( -z "$projeto" || "$projeto" == '<no value>' ) ]] \
+            || falhar "O container $nome pertence a outra instalacao. Ele foi preservado; resolva o conflito de nomes."
+        if [[ "$nome" == db-minerva ]]; then
+            volume="$(sudo docker inspect --format '{{range .Mounts}}{{if eq .Destination "/var/lib/mysql"}}{{.Name}}{{end}}{{end}}' "$nome")"
+            [[ "$volume" == minerva-mysql-data ]] \
+                || falhar 'O banco existente nao usa minerva-mysql-data. Migre os dados antes de substituir o container.'
+        fi
+        legados+=("$nome")
+    done
+    if (( ${#legados[@]} > 0 )); then
+        printf 'Migrando containers da versao anterior para Docker Compose; o volume sera preservado.\n'
+        sudo docker stop --time 60 "${legados[@]}"
+        # Sem -v: o banco permanece no volume minerva-mysql-data.
+        sudo docker rm "${legados[@]}"
     fi
-    gerenciado="$(sudo docker inspect --format '{{index .Config.Labels "minerva.managed"}}' "$nome")"
-    [[ "$gerenciado" == true ]] || falhar "O container $nome ja existe e nao foi criado por este script. Ele foi preservado; resolva o conflito de nomes antes de continuar."
-    sudo docker start "$nome" >/dev/null || falhar "Nao foi possivel iniciar $nome."
-    printf 'Container %s reutilizado, mantendo configuracao e dados.\n' "$nome"
 }
 
 aguardar_mysql() {
@@ -142,62 +201,23 @@ aguardar_mysql() {
     for ((tentativa = 1; tentativa <= 60; tentativa++)); do
         # Consulta autenticada por TCP: confirma usuario, banco e tabela de logs.
         # MYSQL_PWD evita passar a senha como argumento do processo mysql.
-        if sudo docker exec db-minerva sh -c '
+        if compose exec -T db sh -c '
             export MYSQL_PWD="$MYSQL_PASSWORD"
             exec mysql --protocol=TCP -h127.0.0.1 -u"$MYSQL_USER" "$MYSQL_DATABASE" \
                 -Nse "SELECT 1 FROM logs LIMIT 1"
         ' >/dev/null 2>&1; then
             return
         fi
-        [[ "$(sudo docker inspect --format '{{.State.Running}}' db-minerva)" == true ]] \
-            || falhar 'O MySQL parou. Consulte: sudo docker logs db-minerva'
+        [[ "$(compose ps --status running --services db)" == db ]] \
+            || falhar 'O MySQL nao esta ativo. Execute a instalacao novamente ou consulte: sudo docker compose logs db'
         sleep 5
     done
-    falhar 'MySQL nao ficou pronto em 5 minutos. Confira sudo docker logs db-minerva e as credenciais do volume existente.'
+    falhar 'MySQL nao ficou pronto em 5 minutos. Confira sudo docker compose logs db e as credenciais do volume existente.'
 }
 
 iniciar_servicos() {
-    if ! sudo docker network inspect "$NETWORK" >/dev/null 2>&1; then
-        sudo docker network create "$NETWORK" >/dev/null
-    fi
-    sudo docker volume create minerva-mysql-data >/dev/null
-
-    # Comando solicitado, acrescido de rede, ambiente e volume persistente.
-    if ! reutilizar_container db-minerva; then
-        sudo docker run -d --name db-minerva -p 3306:3306 \
-            --network "$NETWORK" --restart unless-stopped \
-            --label minerva.managed=true \
-            --env-file "$CONFIG_DIR/mysql.env" \
-            --mount source=minerva-mysql-data,target=/var/lib/mysql \
-            minerva-db
-    fi
-    aguardar_mysql
-
-    # Comando solicitado, acrescido da configuracao para acessar db-minerva.
-    if ! reutilizar_container minerva; then
-        sudo docker run -d --name minerva -p 8080:8080 \
-            --network "$NETWORK" --restart unless-stopped \
-            --label minerva.managed=true \
-            --env-file "$CONFIG_DIR/node.env" \
-            minerva-project
-    fi
-
-    local tentativa
-    for ((tentativa = 1; tentativa <= 30; tentativa++)); do
-        if sudo docker exec minerva node -e '
-            const http = require("http");
-            const req = http.get("http://127.0.0.1:8080/", res => {
-                res.resume();
-                process.exit(res.statusCode < 400 ? 0 : 1);
-            });
-            req.on("error", () => process.exit(1));
-            req.setTimeout(2000, () => { req.destroy(); process.exit(1); });
-        ' >/dev/null 2>&1; then
-            return
-        fi
-        sleep 2
-    done
-    falhar 'Node nao respondeu na porta 8080. Consulte: sudo docker logs minerva'
+    # Java fica no perfil jobs e nao e iniciado pelo up dos servicos permanentes.
+    compose up -d --no-build --pull never --wait --wait-timeout 360 db node
 }
 
 agendar_java() {
@@ -221,9 +241,12 @@ agendar_java() {
 }
 
 executar_java() {
-    [[ -f "$CONFIG_DIR/java.env" ]] || falhar 'Execute primeiro: bash ./inicializar.sh instalar'
+    local arquivo
+    for arquivo in mysql.env node.env java.env; do
+        [[ -f "$CONFIG_DIR/$arquivo" ]] || falhar 'Execute primeiro: bash ./inicializar.sh instalar'
+    done
     [[ -f "$PROJECT_DIR/apachePoi/$WORKBOOK" ]] || falhar "Planilha ausente: $PROJECT_DIR/apachePoi/$WORKBOOK"
-    # O descritor fica aberto ate o docker run terminar; evita execucoes simultaneas.
+    # O descritor fica aberto ate o compose run terminar; evita execucoes simultaneas.
     exec 9>"$LOCK_FILE"
     if ! flock -n 9; then
         printf '[%s] Importacao anterior ainda esta em execucao.\n' "$(date -Iseconds)"
@@ -232,13 +255,9 @@ executar_java() {
     printf '[%s] Iniciando Apache POI.\n' "$(date -Iseconds)"
     aguardar_mysql
     # Sem -d e sem politica de reinicio: o processo Java define o ciclo de vida.
-    # --rm remove o container ao terminar; Node e MySQL continuam ativos.
+    # --rm remove o container ao terminar; --no-deps preserva Node e MySQL.
     local resultado=0
-    sudo docker run --rm --name minerva-java \
-        --network "$NETWORK" \
-        --env-file "$CONFIG_DIR/java.env" \
-        --mount "type=bind,source=$PROJECT_DIR/apachePoi/$WORKBOOK,target=/app/$WORKBOOK,readonly" \
-        minerva-java || resultado=$?
+    compose run --rm -T --no-deps --name minerva-java --pull never java || resultado=$?
     printf '[%s] Apache POI encerrado. Codigo de saida: %s\n' "$(date -Iseconds)" "$resultado"
     return "$resultado"
 }
@@ -266,8 +285,11 @@ main() {
     else
         verificar_arquivos
         instalar_dependencias
+        exec 9>"$LOCK_FILE"
+        flock -n 9 || falhar 'Uma importacao ou instalacao ja esta em execucao. Tente novamente quando terminar.'
         criar_configuracoes
         construir_imagens
+        migrar_containers_legados
         iniciar_servicos
         agendar_java
         printf 'Inicializacao concluida. Node: porta 8080; MySQL: porta 3306.\n'

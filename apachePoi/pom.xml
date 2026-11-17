@@ -41,6 +41,7 @@
 
 
     <build>
+        <finalName>apache-poi</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
