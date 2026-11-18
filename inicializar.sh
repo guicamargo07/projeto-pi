@@ -8,6 +8,7 @@ PROJECT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT_FILE="$PROJECT_DIR/inicializar.sh"
 COMPOSE_FILE="$PROJECT_DIR/compose.yaml"
 COMPOSE_PROJECT=minerva
+EC2_HOST=34.235.37.58
 CONFIG_DIR=/etc/minerva
 LOG_FILE=/var/log/minerva-apache-poi.log
 LOCK_FILE=/run/lock/minerva-java.lock
@@ -124,6 +125,9 @@ criar_configuracoes() {
         fi
     done
     if (( existentes == 3 )); then
+        # Atualiza o host da EC2 sem alterar senhas ou opcoes de conexao.
+        sed -i "s/^DB_HOST=.*/DB_HOST=$EC2_HOST/" "$CONFIG_DIR/node.env"
+        sed -i -E "s|^(MINERVA_DB_URL=jdbc:mysql://)[^/]+/|\1$EC2_HOST:3306/|" "$CONFIG_DIR/java.env"
         return
     fi
     (( existentes == 0 )) || falhar "Configuracao incompleta em $CONFIG_DIR; confira os tres arquivos .env."
@@ -143,7 +147,7 @@ EOF
 AMBIENTE_PROCESSO=producao
 APP_HOST=0.0.0.0
 APP_PORT=8080
-DB_HOST=db-minerva
+DB_HOST=$EC2_HOST
 DB_PORT=3306
 DB_DATABASE=MinervaDB
 DB_USER=minerva
@@ -151,7 +155,7 @@ DB_PASSWORD=$senha_app
 TZ=$TIMEZONE
 EOF
     cat > "$CONFIG_DIR/java.env" <<EOF
-MINERVA_DB_URL=jdbc:mysql://db-minerva:3306/MinervaDB?rewriteBatchedStatements=true&useSSL=false&allowPublicKeyRetrieval=true
+MINERVA_DB_URL=jdbc:mysql://$EC2_HOST:3306/MinervaDB?rewriteBatchedStatements=true&useSSL=false&allowPublicKeyRetrieval=true
 MINERVA_DB_USER=minerva
 MINERVA_DB_PASSWORD=$senha_app
 TZ=$TIMEZONE
@@ -292,7 +296,7 @@ main() {
         migrar_containers_legados
         iniciar_servicos
         agendar_java
-        printf 'Inicializacao concluida. Node: porta 8080; MySQL: porta 3306.\n'
+        printf 'Inicializacao concluida. Node: http://%s:8080; MySQL: %s:3306.\n' "$EC2_HOST" "$EC2_HOST"
         printf 'Para importar agora: sudo bash %q executar-java\n' "$SCRIPT_FILE"
     fi
 }
