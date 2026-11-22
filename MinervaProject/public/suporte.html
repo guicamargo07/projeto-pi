@@ -86,19 +86,8 @@
             </ul>
 
             <h2 class="secao__titulo">Meu histórico de chamados</h2>
-            <section class="chamados">
-                <a class="chamado">
-                    <span class="chamado__numero">#1024</span>
-                    <span class="chamado__assunto">Erro ao interpretar o arquivo</span>
-                    <span class="chamado__status chamado__status--aberto">ABERTO</span>
-                </a>
-                <a class="chamado">
-                    <span class="chamado__numero">#1021</span>
-                    <span class="chamado__assunto">Dúvida sobre Dashboard</span>
-                    <span class="chamado__status chamado__status--fechado">FECHADO</span>
-                </a>
-            </section>
 
+            <section class="chamados" id="listaChamados"></section>
             
             <div class="acoes">
                 <a href="abrirChamado.html" class="botao botao--primario">Abrir novo chamado</a>
@@ -121,6 +110,57 @@
                 logout();
             });
         })();
+        function escaparHtml(texto) {
+    const div = document.createElement("div");
+    div.textContent = texto;
+    return div.innerHTML;
+}
+
+function carregarChamados() {
+    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+    const lista = document.getElementById("listaChamados");
+
+    if (!usuario || !usuario.idUsuario) {
+        lista.innerHTML = "<p>Faça login para ver seus chamados.</p>";
+        return;
+    }
+
+    fetch(`/chamados/listar/${usuario.idUsuario}`)
+        .then((resposta) => {
+            if (!resposta.ok) {
+                throw new Error("Erro " + resposta.status);
+            }
+            return resposta.json();
+        })
+        .then((chamados) => {
+            if (chamados.length == 0) {
+                lista.innerHTML = "<p>Você ainda não abriu nenhum chamado.</p>";
+                return;
+            }
+
+            lista.innerHTML = "";
+
+            chamados.forEach((chamado) => {
+                const fechado = chamado.sts == 3 || chamado.sts == 4;
+                const classe = fechado ? "fechado" : "aberto";
+                const texto = fechado ? "FECHADO" : "ABERTO";
+
+                lista.innerHTML += `
+                    <a class="chamado">
+                        <span class="chamado__numero">#${chamado.idChamado}</span>
+                        <span class="chamado__assunto">${escaparHtml(chamado.titulo)}</span>
+                        <span class="chamado__status chamado__status--${classe}">${texto}</span>
+                    </a>
+                `;
+            });
+        })
+        .catch((erro) => {
+            console.log(erro);
+            lista.innerHTML = "<p>Não foi possível carregar seus chamados.</p>";
+        });
+}
+
+carregarChamados();
     </script>
     <script src="js/backIni/sessionStorage.js"></script>
 </body>

@@ -109,11 +109,40 @@
         })();
 
         document.getElementById("formChamado").addEventListener("submit", (e) => {
-            e.preventDefault();
-            // aqui entra o envio real dos dados ao servidor, quando existir
-            alert("Chamado enviado com sucesso! O time de suporte entrará em contato");
-            window.location.href = "suporte.html";
+    e.preventDefault();
+
+    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+
+    if (!usuario || !usuario.idUsuario) {
+        alert("Sessão expirada. Faça login novamente.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    fetch("/chamados/abrir", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            assuntoServer: document.getElementById("assunto").value,
+            categoriaServer: document.getElementById("categoria").value,
+            descricaoServer: document.getElementById("descricao").value,
+            idUsuarioServer: usuario.idUsuario
+        })
+    })
+        .then((resposta) => {
+            if (resposta.ok) {
+                alert("Chamado enviado com sucesso! O time de suporte entrará em contato");
+                window.location.href = "suporte.html";
+            } else {
+                alert("Não foi possível enviar o chamado. Tente novamente.");
+                console.log("Erro:", resposta.status);
+            }
+        })
+        .catch((erro) => {
+            console.log(erro);
+            alert("Erro de conexão com o servidor.");
         });
+});
     </script>
     <script src="js/backIni/sessionStorage.js"></script>
 </body>
