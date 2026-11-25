@@ -26,7 +26,7 @@ falhar() {
 
 verificar_arquivos() {
     local arquivo
-    for arquivo in compose.yaml DB/Dockerfile DB/arquivos/001_script.sql \
+    for arquivo in compose.yaml DB/Dockerfile DB/arquivos/001_script.sql DB/arquivos/002_importacao.sql \
         MinervaProject/Dockerfile MinervaProject/package.json \
         apachePoi/Dockerfile apachePoi/pom.xml "apachePoi/$WORKBOOK"; do
         [[ -f "$PROJECT_DIR/$arquivo" ]] || falhar "Arquivo necessario ausente: $PROJECT_DIR/$arquivo"
@@ -223,6 +223,14 @@ aguardar_mysql() {
     falhar 'MySQL nao ficou pronto em 5 minutos. Confira sudo docker compose logs db e as credenciais do volume existente.'
 }
 
+aplicar_migracao_importacao() {
+    printf 'Aplicando a migracao do controle de importacao...\n'
+    compose exec -T db sh -c '
+        export MYSQL_PWD="$MYSQL_PASSWORD"
+        exec mysql --protocol=TCP -h127.0.0.1 -u"$MYSQL_USER" "$MYSQL_DATABASE"
+    ' < "$PROJECT_DIR/DB/arquivos/002_importacao.sql"
+}
+
 iniciar_servicos() {
     # Java fica no perfil jobs e nao e iniciado pelo up dos servicos permanentes.
     compose up -d --no-build --pull never --wait --wait-timeout 360 db node
@@ -262,6 +270,7 @@ executar_java() {
     fi
     printf '[%s] Iniciando Apache POI.\n' "$(date -Iseconds)"
     aguardar_mysql
+    aplicar_migracao_importacao
     # Sem -d e sem politica de reinicio: o processo Java define o ciclo de vida.
     # --rm remove o container ao terminar; --no-deps preserva Node e MySQL.
     local resultado=0
@@ -299,6 +308,7 @@ main() {
         construir_imagens
         migrar_containers_legados
         iniciar_servicos
+        aplicar_migracao_importacao
         agendar_java
         printf 'Inicializacao concluida. Node: http://%s:8080; MySQL: %s:3306.\n' "$EC2_HOST" "$EC2_HOST"
         printf 'Para importar agora: sudo bash %q executar-java\n' "$SCRIPT_FILE"
