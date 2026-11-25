@@ -146,7 +146,7 @@ public class CensoDao extends BaseDao {
         private final Comandos comandos;
         private final String hash;
         private final String nomeArquivo;
-        private final List<Object[]> existentes;
+        private final Map<List<Object>, Integer> existentesPendentes = new LinkedHashMap<>();
         private final Map<String, Integer> locais = cache();
         private final Map<List<Object>, Integer> instituicoes = cache();
         private final Map<List<Object>, Integer> cursos = cache();
@@ -160,7 +160,10 @@ public class CensoDao extends BaseDao {
             this.comandos = comandos;
             this.hash = hash;
             this.nomeArquivo = nomeArquivo;
-            this.existentes = existentes;
+            for (Object[] valores : existentes) {
+                List<Object> chave = Arrays.asList(valores);
+                existentesPendentes.merge(chave, 1, Integer::sum);
+            }
             this.controleCriado = estado != null;
             this.ultimaLinha = estado == null ? 0 : estado.ultimaLinha();
         }
@@ -177,10 +180,14 @@ public class CensoDao extends BaseDao {
 
         void processar(RegistroCenso registro, int numero) throws SQLException {
             if (!controleCriado) {
-                if (!Arrays.equals(existentes.get(numero - 1), valoresPersistidos(registro))) {
-                    throw new SQLException("O registro " + numero + " diverge da importação existente. A adoção foi interrompida sem inserir dados.");
+                List<Object> chave = Arrays.asList(valoresPersistidos(registro));
+                Integer restantes = existentesPendentes.get(chave);
+                if (restantes == null) {
+                    throw new SQLException("O registro " + numero + " não corresponde a nenhum registro antigo ainda não validado. A adoção foi interrompida sem inserir dados.");
                 }
-                if (numero == existentes.size()) {
+                if (restantes == 1) existentesPendentes.remove(chave);
+                else existentesPendentes.put(chave, restantes - 1);
+                if (existentesPendentes.isEmpty()) {
                     criarControle(numero);
                     System.out.println("Importação anterior validada e adotada: " + numero + " registros preservados.");
                 }
