@@ -24,6 +24,12 @@ public class CensoDao extends BaseDao {
     private static final int LIMITE_ADOCAO = 10000;
     private static final int LIMITE_CACHE = 20000;
     private static final String LOCK = "minerva-importacao-censo";
+        private static final String[] CAMPOS_VALIDACAO = {
+            "anoCenso", "municipio", "codigoIes", "areaGeral", "modalidadeEnsino", "vagasOfertadas",
+            "inscritos", "ingressantes", "matriculas", "concluintes", "matriculas0a17", "matriculas18a24",
+            "matriculas25a29", "matriculas30a34", "matriculas35a39", "matriculas40a49",
+            "matriculas50a59", "matriculas60Mais"
+        };
     private static final String SQL_INSERT_DADOS =
             "INSERT INTO dadosCurso (anoCenso, vagasOfertadas, inscritos, ingressantes, matriculas, " +
             "concluintes, matriculas0a17, matriculas18a24, matriculas25a29, matriculas30a34, " +
@@ -141,11 +147,22 @@ public class CensoDao extends BaseDao {
                 f.getMat35a39(), f.getMat40a49(), f.getMat50a59(), f.getMat60Mais() };
     }
 
+    private static String descreverDivergencias(Object[] banco, Object[] planilha) {
+        List<String> divergencias = new ArrayList<>();
+        for (int i = 0; i < CAMPOS_VALIDACAO.length; i++) {
+            if (!java.util.Objects.equals(banco[i], planilha[i])) {
+                divergencias.add(CAMPOS_VALIDACAO[i] + " (Excel=" + planilha[i] + ", banco=" + banco[i] + ")");
+            }
+        }
+        return String.join("; ", divergencias);
+    }
+
     private class Sessao {
         private final Connection con;
         private final Comandos comandos;
         private final String hash;
         private final String nomeArquivo;
+        private final List<Object[]> existentes;
         private final Map<List<Object>, Integer> existentesPendentes = new LinkedHashMap<>();
         private final Map<String, Integer> locais = cache();
         private final Map<List<Object>, Integer> instituicoes = cache();
@@ -160,6 +177,7 @@ public class CensoDao extends BaseDao {
             this.comandos = comandos;
             this.hash = hash;
             this.nomeArquivo = nomeArquivo;
+            this.existentes = existentes;
             for (Object[] valores : existentes) {
                 List<Object> chave = Arrays.asList(valores);
                 existentesPendentes.merge(chave, 1, Integer::sum);
@@ -183,7 +201,11 @@ public class CensoDao extends BaseDao {
                 List<Object> chave = Arrays.asList(valoresPersistidos(registro));
                 Integer restantes = existentesPendentes.get(chave);
                 if (restantes == null) {
-                    throw new SQLException("O registro " + numero + " não corresponde a nenhum registro antigo ainda não validado. A adoção foi interrompida sem inserir dados.");
+                    String detalhes = numero <= existentes.size()
+                        ? descreverDivergencias(existentes.get(numero - 1), valoresPersistidos(registro))
+                        : "não há registro antigo nesta posição";
+                    throw new SQLException("O registro " + numero + " não corresponde aos dados antigos ainda não validados. " +
+                        "Diferenças na posição ordenada por idDadosCurso: " + detalhes + ". A adoção foi interrompida sem inserir dados.");
                 }
                 if (restantes == 1) existentesPendentes.remove(chave);
                 else existentesPendentes.put(chave, restantes - 1);
