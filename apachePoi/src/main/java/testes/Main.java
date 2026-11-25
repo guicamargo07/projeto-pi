@@ -1,25 +1,31 @@
 package testes;
 
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Main {
-
-    private static final int LIMITE_REGISTROS = 1000;
-    private static final int LIMITE_EXIBICAO = 10;
-
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         String nomeArquivo = "MICRODADOS_CURSOS_2019_2024_MINERVA.xlsx";
-
-        LeitorArquivo<RegistroCenso> leitor = new LeitorExcel(nomeArquivo);
-        CensoDao censoDao = new CensoDao();
-        LogDao logDao = new LogDao();
-
-        ImportadorCenso importador = new ImportadorCenso(leitor, censoDao, logDao);
-        importador.executar(LIMITE_REGISTROS, LIMITE_EXIBICAO);
-
-        String webhookUrl = System.getenv("SLACK_WEBHOOK_URL");
-        Notificacoes slack = new Notificacoes(webhookUrl);
-
-        slack.enviarNotificacao("Processo concluído com sucesso!");
+        int limite = 0;
+        boolean notificarSlack = false;
+        for (String argumento : args) {
+            if (argumento.startsWith("--arquivo=")) nomeArquivo = argumento.substring("--arquivo=".length());
+            else if (argumento.startsWith("--limite=")) {
+                limite = Integer.parseInt(argumento.substring("--limite=".length()));
+                if (limite < 1) throw new IllegalArgumentException("--limite deve ser um inteiro positivo.");
+            } else if ("--notificar-slack".equals(argumento)) notificarSlack = true;
+            else throw new IllegalArgumentException("Argumento desconhecido: " + argumento);
+        }
+        Path caminho = Path.of(nomeArquivo);
+        if (!Files.isRegularFile(caminho) && !caminho.isAbsolute()) {
+            Path alternativa = Path.of("apachePoi").resolve(caminho);
+            if (Files.isRegularFile(alternativa)) caminho = alternativa;
+        }
+        if (!Files.isRegularFile(caminho)) throw new IllegalArgumentException("Planilha não encontrada: " + caminho.toAbsolutePath());
+        LeitorArquivo<RegistroCenso> leitor = new LeitorExcel(caminho.toAbsolutePath().toString());
+        ImportadorCenso importador = new ImportadorCenso(leitor, new CensoDao(), new LogDao());
+        importador.executar(limite, 0);
+        // A presença do webhook sozinha nunca autoriza uma mensagem externa.
+        if (notificarSlack) new Notificacoes(System.getenv("SLACK_WEBHOOK_URL")).enviarNotificacao("Importação do censo concluída.");
     }
 }
