@@ -1,4 +1,5 @@
 var database = require("../database/config");
+var geografia = require("./geografia");
 
 // Nomes de tabelas e expressões SQL vêm somente desta lista interna.
 const TABELAS = Object.freeze({
@@ -7,6 +8,8 @@ const TABELAS = Object.freeze({
     expansao: "dashExpansao"
 });
 const MODALIDADES = Object.freeze({ 1: "Presencial", 2: "EAD" });
+const ANO_FINAL_PADRAO = 2021;
+const ANO_PARCIAL = 2022;
 const FAIXAS = [
     ["mat0a17", "matriculas0a17", "Até 17 anos"],
     ["mat18a24", "matriculas18a24", "18–24 anos"],
@@ -65,12 +68,20 @@ function condicoes(fonte, filtros, anos) {
     const params = [];
     const campos = {
         regiao: "l.regiao", uf: "l.uf", localizacao: "l.idLocalizacao",
-        modalidade: estrutura(fonte).modalidade, curso: "c.idCurso"
+        modalidade: estrutura(fonte).modalidade, curso: "c.idCurso",
+        area: fonte.nome === "dashRetencao" ? "COALESCE(d.areaGeral, c.areaGeral)" : "c.areaGeral"
     };
     for (const [campo, coluna] of Object.entries(campos)) {
         if (filtros[campo] !== undefined) {
             partes.push(coluna + " = ?");
             params.push(filtros[campo]);
+        }
+    }
+    if (filtros.idsGeograficos !== undefined) {
+        if (!filtros.idsGeograficos.length) partes.push("1 = 0");
+        else {
+            partes.push("l.idLocalizacao IN (" + filtros.idsGeograficos.map(() => "?").join(", ") + ")");
+            params.push(...filtros.idsGeograficos);
         }
     }
     if (anos) {
@@ -85,38 +96,77 @@ function consultar(fonte, selecao, filtros, anos, final = "") {
     return database.executar("SELECT " + selecao + estrutura(fonte).from + where.sql + final, where.params);
 }
 
-async function filtros(painel = "geral") {
+async function informacoesImportacao(fonte) {
+    if (fonte.dedicada) return null;
+    try {
+        const [importacao] = await database.executar(
+            "SELECT ultimaLinha, concluida FROM importacaoCenso ORDER BY atualizadoEm DESC LIMIT 1", []);
+        return importacao || null;
+    } catch (erro) {
+        if (erro.code !== "ER_NO_SUCH_TABLE" && erro.errno !== 1146) throw erro;
+        return null;
+    }
+}
+
+async function prepararGeografia(filtros) {
+    if (filtros.uf === undefined && filtros.regiao === undefined) return filtros;
+    const locais = await database.executar("SELECT idLocalizacao, municipio, uf, regiao FROM localizacao", []);
+    const idsGeograficos = locais.filter(local => geografia.corresponde(local, filtros))
+        .map(local => Number(local.idLocalizacao)).filter(id => Number.isSafeInteger(id) && id > 0);
+    return { ...filtros, uf: undefined, regiao: undefined, idsGeograficos };
+}
+
+async function filtros(painel = "geral", opcoes = {}) {
     const fonte = await fonteDoPainel(painel);
     const base = estrutura(fonte);
-    const [anos, locais, cursos, modalidades] = await Promise.all([
+    const expressaoArea = fonte.nome === "dashRetencao" ? "COALESCE(d.areaGeral, c.areaGeral)" : "c.areaGeral";
+    const consultaCursos = opcoes.compacto
+        ? database.executar("SELECT DISTINCT " + expressaoArea + " AS area" + base.from +
+            " WHERE " + expressaoArea + " IS NOT NULL ORDER BY area", [])
+        : database.executar("SELECT DISTINCT c.idCurso, c.nomeCurso, c.areaGeral, i.codigoIes, l.municipio, l.uf, " +
+            base.modalidade + " AS modalidade" + base.from +
+            " WHERE c.idCurso IS NOT NULL ORDER BY c.nomeCurso, c.idCurso", []);
+    const [anos, locais, cursos, modalidades, importacao] = await Promise.all([
         consultar(fonte, "DISTINCT d.anoCenso AS ano", {}, null, " ORDER BY ano"),
         database.executar("SELECT DISTINCT l.idLocalizacao, l.municipio, l.uf, l.regiao" +
             base.from + " WHERE l.idLocalizacao IS NOT NULL ORDER BY l.regiao, l.uf, l.municipio, l.idLocalizacao", []),
-        database.executar("SELECT DISTINCT c.idCurso, c.nomeCurso, i.codigoIes, l.municipio, l.uf, " +
-            base.modalidade + " AS modalidade" +
-            base.from + " WHERE c.idCurso IS NOT NULL ORDER BY c.nomeCurso, c.idCurso", []),
+        consultaCursos,
         database.executar("SELECT DISTINCT " + base.modalidade + " AS modalidade" +
-            base.from + " WHERE " + base.modalidade + " IN (1, 2) ORDER BY modalidade", [])
+            base.from + " WHERE " + base.modalidade + " IN (1, 2) ORDER BY modalidade", []),
+        informacoesImportacao(fonte)
     ]);
-    const municipios = locais.map(local => ({
+    const resolvidos = locais.map(geografia.resolverLocalidade);
+    const municipios = resolvidos.map(local => ({
         idLocalizacao: numero(local.idLocalizacao),
         municipio: String(local.municipio ?? ""),
-        uf: String(local.uf ?? ""),
-        regiao: String(local.regiao ?? "")
+        uf: local.uf,
+        regiao: local.regiao
     }));
     const regioes = [...new Set(municipios.map(local => local.regiao).filter(Boolean))];
     const ufs = [...new Map(municipios.filter(local => local.uf).map(local =>
         [local.uf + "|" + local.regiao, { uf: local.uf, regiao: local.regiao }])).values()];
+    const anosDisponiveis = anos.map(linha => numero(linha.ano)).filter(ano => ano !== null).sort((a, b) => a - b);
+    const anoParcial = anosDisponiveis.includes(ANO_PARCIAL) ? ANO_PARCIAL :
+        (importacao && numero(importacao.concluida) === 1 && numero(importacao.ultimaLinha) >= 1048575
+            ? anosDisponiveis.at(-1) ?? null : null);
     return {
-        anos: anos.map(linha => numero(linha.ano)).filter(ano => ano !== null),
+        anos: anosDisponiveis,
+        anoParcial,
+        anoInicioPadrao: Math.min(anosDisponiveis[0] ?? ANO_FINAL_PADRAO, ANO_FINAL_PADRAO),
+        anoFimPadrao: ANO_FINAL_PADRAO,
+        geografia: {
+            municipiosSemUf: municipios.filter(local => !local.uf).length,
+            municipiosComplementados: resolvidos.filter(local => local.origemGeografia === "referencia").length
+        },
         regioes,
         ufs,
         municipios,
-        cursos: cursos.map(curso => {
+        areas: [...new Set(cursos.map(curso => String((opcoes.compacto ? curso.area : curso.areaGeral) ?? "").trim()).filter(Boolean))],
+        cursos: opcoes.compacto ? [] : cursos.map(curso => {
             const resultado = { idCurso: numero(curso.idCurso), nomeCurso: String(curso.nomeCurso ?? "") };
             if (curso.codigoIes !== undefined) resultado.codigoIes = numero(curso.codigoIes);
             if (curso.municipio !== undefined) resultado.municipio = curso.municipio;
-            if (curso.uf !== undefined) resultado.uf = curso.uf;
+            if (curso.uf !== undefined) resultado.uf = geografia.resolverLocalidade(curso).uf;
             if (curso.modalidade !== undefined) resultado.modalidade = numero(curso.modalidade);
             return resultado;
         }),
@@ -127,10 +177,11 @@ async function filtros(painel = "geral") {
 
 async function contextoDoPainel(painel, filtrosAplicados) {
     const fonte = await fonteDoPainel(painel);
+    const filtrosPreparados = await prepararGeografia(filtrosAplicados);
     const [limites = {}] = await database.executar(
         "SELECT MIN(anoCenso) AS anoMinimo, MAX(anoCenso) AS anoMaximo FROM " + fonte.nome, []);
-    let anoInicio = filtrosAplicados.anoInicio ?? numero(limites.anoMinimo);
-    let anoFim = filtrosAplicados.anoFim ?? numero(limites.anoMaximo);
+    let anoFim = filtrosAplicados.anoFim ?? ANO_FINAL_PADRAO;
+    let anoInicio = filtrosAplicados.anoInicio ?? Math.min(numero(limites.anoMinimo) ?? anoFim, anoFim);
     if (anoInicio === null) anoInicio = anoFim;
     if (anoFim === null) anoFim = anoInicio;
     // Um limite explícito fora da série produz um recorte vazio, sem inverter o período.
@@ -139,26 +190,29 @@ async function contextoDoPainel(painel, filtrosAplicados) {
         else anoInicio = anoFim;
     }
     const observacoes = [];
+    let anoParcial = numero(limites.anoMinimo) <= ANO_PARCIAL && numero(limites.anoMaximo) >= ANO_PARCIAL ? ANO_PARCIAL : null;
+    if (anoParcial === ANO_PARCIAL) observacoes.push("2022 contém informações parciais. O ano final padrão é 2021.");
     if (!fonte.dedicada) {
         observacoes.push("Indicadores calculados a partir dos dados de cursos importados.");
-        try {
-            const [importacao] = await database.executar(
-                "SELECT ultimaLinha, concluida FROM importacaoCenso ORDER BY atualizadoEm DESC LIMIT 1", []);
+        {
+            const importacao = await informacoesImportacao(fonte);
             if (importacao && numero(importacao.concluida) === 0) {
                 observacoes.push("Importação em andamento; os indicadores refletem apenas os lotes já gravados.");
             } else if (importacao && numero(importacao.concluida) === 1 && numero(importacao.ultimaLinha) >= 1048575) {
-                observacoes.push("A planilha atingiu o limite de linhas do Excel; o último ano disponível pode estar incompleto.");
+                if (anoParcial === ANO_PARCIAL) {
+                    observacoes[0] += " A planilha atingiu o limite de linhas do Excel.";
+                } else {
+                    anoParcial = numero(limites.anoMaximo);
+                    observacoes.push("A planilha atingiu o limite de linhas do Excel; os dados de " + anoParcial + " podem estar incompletos.");
+                }
             }
-        } catch (erro) {
-            // Instalações anteriores podem não ter o controle de importação.
-            if (erro.code !== "ER_NO_SUCH_TABLE" && erro.errno !== 1146) throw erro;
         }
     }
     if (fonte.dedicada && painel === "geral") observacoes.push(
         "O público predominante considera as faixas etárias predominantes em cada registro consolidado; esta fonte não contém a distribuição etária completa.");
     if (fonte.dedicada && painel === "expansao") observacoes.push(
         "A quantidade de instituições soma os totais consolidados; uma instituição pode aparecer mais de uma vez em recortes sobrepostos.");
-    return { fonte: fonte.nome, dedicada: fonte.dedicada, anoInicio, anoFim, observacoes, filtros: filtrosAplicados };
+    return { fonte: fonte.nome, dedicada: fonte.dedicada, anoInicio, anoFim, anoParcial, observacoes, filtros: filtrosPreparados };
 }
 
 function fonteDoContexto(contexto) {
@@ -205,6 +259,7 @@ function meta(contexto, anuais, expansao = false) {
         anoFim: contexto.anoFim,
         anoReferencia: contexto.anoFim,
         anoComparacao: expansao ? contexto.anoInicio : (contexto.anoFim === null ? null : contexto.anoFim - 1),
+        anoParcial: contexto.anoParcial ?? null,
         semDados,
         observacoes
     };
@@ -280,7 +335,7 @@ async function retencao(filtrosAplicados = {}) {
 function montarExpansao(contexto, anuais, linhas = []) {
     const atual = doAno(anuais, contexto.anoFim);
     const municipios = new Map();
-    linhas.forEach(linha => {
+    linhas.map(geografia.resolverLocalidade).forEach(linha => {
         const chave = JSON.stringify([linha.municipio, linha.uf]);
         if (!municipios.has(chave)) municipios.set(chave, { municipio: linha.municipio || "Não informado", uf: linha.uf || null, linhas: [] });
         municipios.get(chave).linhas.push(linha);

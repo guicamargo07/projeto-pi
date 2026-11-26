@@ -57,64 +57,50 @@
           <p class="subtitulo">Onde o crescimento é favorável?</p>
         </div>
       </div>
-      <form id="dashboardFiltros" class="dashboard-filtros" aria-label="Filtros do painel">
+      <form id="dashboardFiltros" class="dashboard-filtros" aria-label="Filtros da análise">
+        <div class="filtros__cabecalho">
+          <h2>Filtros da análise</h2>
+          <p>Escolha o recorte e aplique para atualizar os resultados.</p>
+        </div>
         <fieldset id="dashboardCampos" disabled>
-          <legend>Filtros do painel</legend>
-          <div class="filtros__grade">
-            <label for="anoInicio">
-              Ano inicial
-              <select id="anoInicio" name="anoInicio">
-                <option value="">Carregando…</option>
-              </select>
-            </label>
-            <label for="anoFim">
-              Ano final
-              <select id="anoFim" name="anoFim">
-                <option value="">Carregando…</option>
-              </select>
-            </label>
-            <label for="regiao">
-              Região
-              <select id="regiao" name="regiao">
-                <option value="">Todas as regiões</option>
-              </select>
-            </label>
-            <label for="uf">
-              UF
-              <select id="uf" name="uf">
-                <option value="">Todas as UFs</option>
-              </select>
-            </label>
-            <label for="localizacao">
-              Município
-              <select id="localizacao" name="localizacao">
-                <option value="">Todos os municípios</option>
-              </select>
-            </label>
-            <label for="modalidade">
-              Modalidade
-              <select id="modalidade" name="modalidade">
-                <option value="">Todas as modalidades</option>
-              </select>
-            </label>
-            <div class="filtros__campo">
-              <label for="buscarCurso">Buscar curso</label>
-              <input type="search" id="buscarCurso" autocomplete="off" aria-describedby="cursoBuscaAjuda">
-              <small id="cursoBuscaAjuda" class="filtros__ajuda">Digite ao menos 2 caracteres do curso, município ou código da IES.</small>
+          <legend class="visualmente-oculto">Definir filtros</legend>
+          <div class="filtros__secoes">
+            <div class="filtros__secao">
+              <h3>Período</h3>
+              <div class="filtros__linha"><label for="anoInicio">De<select id="anoInicio" name="anoInicio"><option value="">Carregando…</option></select></label>
+                <label for="anoFim">Até<select id="anoFim" name="anoFim"><option value="">Carregando…</option></select></label>
+              </div>
+              <p id="periodoAjuda" class="filtros__ajuda">Carregando os anos disponíveis…</p>
             </div>
-            <div class="filtros__campo">
-              <label for="curso">Curso</label>
-              <select id="curso" name="curso" aria-describedby="cursoBuscaStatus">
-                <option value="">Todos os cursos</option>
-              </select>
-              <small id="cursoBuscaStatus" class="filtros__ajuda" role="status" aria-live="polite" aria-atomic="true">Digite ao menos 2 caracteres para buscar cursos.</small>
+            <div class="filtros__secao">
+              <h3>Localização</h3>
+              <div class="filtros__linha filtros__linha--local">
+                <label for="regiao">Região<select id="regiao" name="regiao"><option value="">Todas as regiões</option></select></label>
+                <label for="uf">Estado<select id="uf" name="uf"><option value="">Todos os estados</option></select></label>
+                <label for="localizacao">Município<select id="localizacao" name="localizacao"><option value="">Todos os municípios</option></select></label>
+              </div>
+              <p id="geografiaAjuda" class="filtros__ajuda"></p>
+              <details class="filtros__metodo"><summary>Sobre a localização</summary>
+                <p>Quando falta a UF no cadastro, usamos a referência do IBGE somente se o nome identificar um único município. Nomes homônimos continuam como não identificados.</p>
+              </details>
             </div>
+            <div class="filtros__secao">
+              <h3>Ensino</h3>
+              <div class="filtros__linha filtros__linha--ensino">
+                <label for="modalidade">Modalidade<select id="modalidade" name="modalidade"><option value="">Todas as modalidades</option></select></label>
+                <label for="area">Área de conhecimento<select id="area" name="area"><option value="">Todas as áreas</option></select></label>
+              </div>
+            </div>
+          </div>
+          <div class="filtros__rodape">
+            <p class="filtros__ajuda">— significa que não há informação suficiente para calcular o indicador.</p>
             <div class="filtros__acoes">
+              <button type="button" id="dashboardLimpar" class="dashboard-botao dashboard-botao--secundario">Restaurar filtros</button>
               <button type="submit" class="dashboard-botao">Aplicar filtros</button>
-              <button type="button" id="dashboardLimpar" class="dashboard-botao dashboard-botao--secundario">Limpar</button>
             </div>
           </div>
         </fieldset>
+        <p id="filtrosPendentes" class="filtros__pendentes" role="status" hidden></p>
       </form>
       <div class="dashboard-contexto">
         <p id="dashboardContexto">Carregando o período e os indicadores…</p>
@@ -129,30 +115,30 @@
         <section class="cards" aria-label="Indicadores de expansão">
           <div class="card">
             <div class="card__cabecalho">
-              <span class="card__rotulo">TAXA DE INTERESSE</span>
+              <span class="card__rotulo">INSCRITOS POR VAGA</span>
               <span class="kpi-ajuda">
-                <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculado: Taxa de interesse?" aria-describedby="tooltip-interesse" aria-expanded="false">?</button>
+                <button type="button" class="kpi-ajuda__botao" aria-label="Entenda: Inscritos por vaga" aria-describedby="tooltip-interesse" aria-expanded="false">?</button>
                 <span class="kpi-tooltip" id="tooltip-interesse" role="tooltip" hidden>
-                  <strong class="kpi-tooltip__titulo">Taxa de interesse</strong>
+                  <strong class="kpi-tooltip__titulo">Inscritos por vaga</strong>
                   <span>Quantidade de candidatos inscritos por vaga ofertada no último ano selecionado.</span>
                   <span class="kpi-tooltip__formula">Inscritos ÷ Vagas ofertadas.</span>
-                  <span class="kpi-tooltip__exemplo">O resultado é expresso em candidatos por vaga. Sem vagas como base, o resultado aparece como —.</span>
+                  <span class="kpi-tooltip__exemplo">São os inscritos informados pela base, não uma contagem de pessoas únicas entre cursos. Sem vagas como base, o resultado aparece como —.</span>
                 </span>
               </span>
             </div>
             <strong id="kpiInteresse" data-kpi class="card__valor ">—</strong>
-            <span class="card__detalhe">candidatos por vaga</span>
+            <span class="card__detalhe">inscritos por vaga</span>
           </div>
           <div class="card">
             <div class="card__cabecalho">
               <span class="card__rotulo">INSTITUIÇÕES COM OFERTA</span>
               <span class="kpi-ajuda">
-                <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculado: Instituições com oferta?" aria-describedby="tooltip-instituicoes" aria-expanded="false">?</button>
+                <button type="button" class="kpi-ajuda__botao" aria-label="Entenda: Instituições com oferta" aria-describedby="tooltip-instituicoes" aria-expanded="false">?</button>
                 <span class="kpi-tooltip" id="tooltip-instituicoes" role="tooltip" hidden>
                   <strong class="kpi-tooltip__titulo">Instituições com oferta</strong>
                   <span>Quantidade de instituições com oferta no último ano selecionado, respeitando os filtros.</span>
                   <span class="kpi-tooltip__formula">Total de instituições com oferta no ano de referência.</span>
-                  <span class="kpi-tooltip__exemplo">A base consolidada soma as quantidades de instituições dos registros filtrados. A base de cursos conta instituições distintas; consulte a fonte indicada no painel.</span>
+                  <span class="kpi-tooltip__exemplo">Na base de cursos, cada instituição com vagas é contada uma vez. Em dados consolidados, o total soma as quantidades dos registros e pode conter sobreposições, sinalizadas no painel.</span>
                 </span>
               </span>
             </div>
@@ -162,7 +148,7 @@
             <div class="card__cabecalho">
               <span class="card__rotulo">TOTAL DE VAGAS</span>
               <span class="kpi-ajuda">
-                <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculado: Total de vagas?" aria-describedby="tooltip-vagas" aria-expanded="false">?</button>
+                <button type="button" class="kpi-ajuda__botao" aria-label="Entenda: Total de vagas" aria-describedby="tooltip-vagas" aria-expanded="false">?</button>
                 <span class="kpi-tooltip" id="tooltip-vagas" role="tooltip" hidden>
                   <strong class="kpi-tooltip__titulo">Total de vagas</strong>
                   <span>Total de vagas ofertadas no último ano selecionado, respeitando os filtros.</span>
@@ -174,22 +160,31 @@
             <strong id="kpiVagas" data-kpi class="card__valor ">—</strong>
           </div>
         </section>
-        <h2 id="tituloMercados" class="grafico__titulo">Mercados em crescimento</h2>
-        <p class="dashboard-nota">Crescimento das matrículas entre o ano inicial e o ano final, por modalidade. Interesse em candidatos por vaga no último ano selecionado.</p>
-        <div class="tabela-wrapper">
+        <h2 id="tituloMercados" class="grafico__titulo">Variação de matrículas por município</h2>
+        <p class="dashboard-nota">Variação das matrículas entre os dois anos selecionados, por modalidade. Os inscritos por vaga são calculados no ano final.</p>
+        <div class="tabela-controles">
+        <label for="buscarMunicipioTabela">Buscar município<input type="search" id="buscarMunicipioTabela" placeholder="Nome do município ou UF" autocomplete="off"></label>
+        <label for="ordenarMercados">Ordenar por<select id="ordenarMercados"><option value="presencial">Maior variação presencial</option><option value="ead">Maior variação EAD</option><option value="municipio">Nome do município</option></select></label>
+      </div>
+      <div class="tabela-wrapper">
           <table class="tabela">
-            <caption class="visualmente-oculto">Crescimento de matrículas e interesse por município</caption>
+            <caption class="visualmente-oculto">Variação de matrículas e inscritos por vaga por município</caption>
             <thead>
               <tr>
                 <th scope="col">Município / UF</th>
-                <th scope="col">Cres. Presencial</th>
-                <th scope="col">Cres. EAD</th>
-                <th scope="col">Interesse</th>
+                <th scope="col">Variação presencial</th>
+                <th scope="col">Variação EAD</th>
+                <th scope="col">Inscritos por vaga</th>
               </tr>
             </thead>
             <tbody id="corpoTabela"></tbody>
           </table>
         </div>
+      <div class="tabela-paginacao">
+        <span id="tabelaContagem" role="status"></span>
+        <div><button type="button" id="paginaAnterior" class="dashboard-botao dashboard-botao--secundario" disabled>Anterior</button>
+        <button type="button" id="paginaSeguinte" class="dashboard-botao dashboard-botao--secundario" disabled>Próxima</button></div>
+      </div>
       </div>
     </main>
   </div>

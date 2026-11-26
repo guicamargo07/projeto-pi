@@ -1,7 +1,8 @@
 var dashboardModel = require("../models/dashboardModel");
+var geografia = require("../models/geografia");
 
 const PAINEIS = ["geral", "retencao", "expansao"];
-const CAMPOS = ["anoInicio", "anoFim", "regiao", "uf", "localizacao", "modalidade", "curso"];
+const CAMPOS = ["anoInicio", "anoFim", "regiao", "uf", "localizacao", "modalidade", "curso", "area"];
 
 function invalido(mensagem) {
     const erro = new Error(mensagem);
@@ -36,14 +37,19 @@ function validarFiltros(query) {
         modalidade: inteiro(query, "modalidade", 1, 2),
         curso: inteiro(query, "curso", 1, 2147483647)
     };
-    const regiao = texto(query, "regiao");
-    if (regiao !== undefined && (regiao.length > 50 || !/^[\p{L}\p{M} -]+$/u.test(regiao))) {
+    const regiaoRecebida = texto(query, "regiao");
+    const regiao = regiaoRecebida === geografia.REGIAO_AUSENTE ? regiaoRecebida :
+        geografia.regioes.find(item => item.toLowerCase() === regiaoRecebida?.toLowerCase());
+    if (regiaoRecebida !== undefined && !regiao) {
         invalido("Filtro inválido: regiao.");
     }
     const uf = texto(query, "uf");
-    if (uf !== undefined && !/^[a-z]{2}$/i.test(uf)) invalido("Filtro inválido: uf.");
+    if (uf !== undefined && uf !== geografia.UF_AUSENTE && !geografia.ufValida(uf)) invalido("Filtro inválido: uf.");
+    const area = texto(query, "area");
+    if (area !== undefined && (area.length > 150 || /[\u0000-\u001f]/.test(area))) invalido("Filtro inválido: area.");
+    filtros.area = area;
     filtros.regiao = regiao;
-    filtros.uf = uf === undefined ? undefined : uf.toUpperCase();
+    filtros.uf = uf === undefined || uf === geografia.UF_AUSENTE ? uf : uf.toUpperCase();
     if (filtros.anoInicio !== undefined && filtros.anoFim !== undefined && filtros.anoInicio > filtros.anoFim) {
         invalido("O ano inicial não pode ser maior que o ano final.");
     }
@@ -58,10 +64,12 @@ function responderErro(res, erro) {
 
 async function filtros(req, res) {
     try {
-        if (Object.keys(req.query).some(campo => campo !== "painel")) invalido("Filtro desconhecido.");
+        if (Object.keys(req.query).some(campo => !["painel", "compacto"].includes(campo))) invalido("Filtro desconhecido.");
         const painel = texto(req.query, "painel") || "geral";
         if (!PAINEIS.includes(painel)) invalido("Painel inválido.");
-        return res.json(await dashboardModel.filtros(painel));
+        const compacto = texto(req.query, "compacto");
+        if (compacto !== undefined && compacto !== "1") invalido("Filtro inválido: compacto.");
+        return res.json(await dashboardModel.filtros(painel, { compacto: compacto === "1" }));
     } catch (erro) {
         return responderErro(res, erro);
     }

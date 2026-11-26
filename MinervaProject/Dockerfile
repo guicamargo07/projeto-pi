@@ -6,11 +6,13 @@ WORKDIR /app
 # Copia os arquivos de dependências
 COPY package*.json ./
 
-# Instala as dependências
-RUN npm install
+# Instala somente as dependências de produção nas versões do lockfile.
+RUN npm ci --omit=dev
 
-# Copia o restante do projeto
-COPY . .
+# Copia somente o que o servidor precisa para funcionar.
+COPY app.js LICENSE ./
+COPY src ./src
+COPY public ./public
 
 # Porta que o Node utilizará
 EXPOSE 8080
