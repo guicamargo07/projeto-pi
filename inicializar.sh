@@ -9,6 +9,9 @@ SCRIPT_FILE="$PROJECT_DIR/inicializar.sh"
 COMPOSE_FILE="$PROJECT_DIR/compose.yaml"
 COMPOSE_PROJECT=minerva
 EC2_HOST=34.235.37.58
+# Java e Node acessam o servico MySQL pela rede interna do Compose na EC2.
+DB_HOST=db
+DB_PORT=3306
 CONFIG_DIR=/etc/minerva
 LOG_FILE=/var/log/minerva-apache-poi.log
 LOCK_FILE=/run/lock/minerva-java.lock
@@ -23,7 +26,7 @@ falhar() {
 
 verificar_arquivos() {
     local arquivo
-    for arquivo in compose.yaml DB/Dockerfile DB/arquivos/001_script.sql \
+    for arquivo in compose.yaml DB/Dockerfile DB/arquivos/001_script.sql DB/arquivos/002_importacao.sql \
         MinervaProject/Dockerfile MinervaProject/package.json \
         apachePoi/Dockerfile apachePoi/pom.xml "apachePoi/$WORKBOOK"; do
         [[ -f "$PROJECT_DIR/$arquivo" ]] || falhar "Arquivo necessario ausente: $PROJECT_DIR/$arquivo"
@@ -125,9 +128,10 @@ criar_configuracoes() {
         fi
     done
     if (( existentes == 3 )); then
-        # Atualiza o host da EC2 sem alterar senhas ou opcoes de conexao.
-        sed -i "s/^DB_HOST=.*/DB_HOST=$EC2_HOST/" "$CONFIG_DIR/node.env"
-        sed -i -E "s|^(MINERVA_DB_URL=jdbc:mysql://)[^/]+/|\1$EC2_HOST:3306/|" "$CONFIG_DIR/java.env"
+        # Corrige o destino interno sem alterar senhas, banco ou opcoes JDBC.
+        sed -i -e "s/^DB_HOST=.*/DB_HOST=$DB_HOST/" \
+            -e "s/^DB_PORT=.*/DB_PORT=$DB_PORT/" "$CONFIG_DIR/node.env"
+        sed -i -E "s|^(MINERVA_DB_URL=jdbc:mysql://)[^/]+/|\1$DB_HOST:$DB_PORT/|" "$CONFIG_DIR/java.env"
         return
     fi
     (( existentes == 0 )) || falhar "Configuracao incompleta em $CONFIG_DIR; confira os tres arquivos .env."
@@ -147,15 +151,15 @@ EOF
 AMBIENTE_PROCESSO=producao
 APP_HOST=0.0.0.0
 APP_PORT=8080
-DB_HOST=$EC2_HOST
-DB_PORT=3306
+DB_HOST=$DB_HOST
+DB_PORT=$DB_PORT
 DB_DATABASE=MinervaDB
 DB_USER=minerva
 DB_PASSWORD=$senha_app
 TZ=$TIMEZONE
 EOF
     cat > "$CONFIG_DIR/java.env" <<EOF
-MINERVA_DB_URL=jdbc:mysql://$EC2_HOST:3306/MinervaDB?rewriteBatchedStatements=true&useSSL=false&allowPublicKeyRetrieval=true
+MINERVA_DB_URL=jdbc:mysql://$DB_HOST:$DB_PORT/MinervaDB?rewriteBatchedStatements=true&useSSL=false&allowPublicKeyRetrieval=true
 MINERVA_DB_USER=minerva
 MINERVA_DB_PASSWORD=$senha_app
 TZ=$TIMEZONE
@@ -219,6 +223,14 @@ aguardar_mysql() {
     falhar 'MySQL nao ficou pronto em 5 minutos. Confira sudo docker compose logs db e as credenciais do volume existente.'
 }
 
+aplicar_migracao_importacao() {
+    printf 'Aplicando a migracao do controle de importacao...\n'
+    compose exec -T db sh -c '
+        export MYSQL_PWD="$MYSQL_PASSWORD"
+        exec mysql --protocol=TCP -h127.0.0.1 -u"$MYSQL_USER" "$MYSQL_DATABASE"
+    ' < "$PROJECT_DIR/DB/arquivos/002_importacao.sql"
+}
+
 iniciar_servicos() {
     # Java fica no perfil jobs e nao e iniciado pelo up dos servicos permanentes.
     compose up -d --no-build --pull never --wait --wait-timeout 360 db node
@@ -258,6 +270,7 @@ executar_java() {
     fi
     printf '[%s] Iniciando Apache POI.\n' "$(date -Iseconds)"
     aguardar_mysql
+    aplicar_migracao_importacao
     # Sem -d e sem politica de reinicio: o processo Java define o ciclo de vida.
     # --rm remove o container ao terminar; --no-deps preserva Node e MySQL.
     local resultado=0
@@ -295,6 +308,7 @@ main() {
         construir_imagens
         migrar_containers_legados
         iniciar_servicos
+        aplicar_migracao_importacao
         agendar_java
         printf 'Inicializacao concluida. Node: http://%s:8080; MySQL: %s:3306.\n' "$EC2_HOST" "$EC2_HOST"
         printf 'Para importar agora: sudo bash %q executar-java\n' "$SCRIPT_FILE"

@@ -1,9 +1,10 @@
 package testes;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Iterator;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.ss.util.CellReference;
@@ -18,127 +19,126 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
 public class LeitorExcel extends LeitorArquivo<RegistroCenso> {
-
-    private static final int TOTAL_COLUNAS = 19;
+    private static final String[] COLUNAS = {
+        "NU_ANO_CENSO", "NO_MUNICIPIO", "CO_IES", "NO_CINE_AREA_GERAL",
+        "NO_CINE_AREA_ESPECIFICA", "TP_MODALIDADE_ENSINO", "QT_VG_TOTAL",
+        "QT_INSCRITO_TOTAL", "QT_ING", "QT_MAT", "QT_MAT_0_17", "QT_MAT_18_24",
+        "QT_MAT_25_29", "QT_MAT_30_34", "QT_MAT_35_39", "QT_MAT_40_49",
+        "QT_MAT_50_59", "QT_MAT_60_MAIS", "QT_CONC"
+    };
 
     private static class LimiteAtingido extends RuntimeException {
-        LimiteAtingido() {
-            super("Limite atingido", null, false, false);
-        }
+        LimiteAtingido() { super("Limite atingido", null, false, false); }
     }
 
-    public LeitorExcel(String nomeArquivo) {
-        super(nomeArquivo);
+    private static class FalhaSql extends RuntimeException {
+        FalhaSql(SQLException causa) { super(causa); }
     }
+
+    public LeitorExcel(String nomeArquivo) { super(nomeArquivo); }
 
     @Override
-    public List<RegistroCenso> extrairRegistros(int limiteRegistros) {
-        List<RegistroCenso> registrosExtraidos = new ArrayList<>();
-
-        System.out.printf("Iniciando leitura do arquivo %s (limite: %d registros)%n",
-                nomeArquivo, limiteRegistros);
-
+    public ResultadoLeitura processarRegistros(int limiteRegistros, int ignorarPrimeiros,
+            ProcessadorRegistro<RegistroCenso> processador) throws IOException, SQLException {
+        if (limiteRegistros < 0 || ignorarPrimeiros < 0) throw new IllegalArgumentException("Limites não podem ser negativos.");
+        int[] total = { 0 };
+        boolean completa = true;
         try (OPCPackage pacote = OPCPackage.open(nomeArquivo, PackageAccess.READ)) {
             ReadOnlySharedStringsTable textos = new ReadOnlySharedStringsTable(pacote);
             XSSFReader leitor = new XSSFReader(pacote);
             StylesTable estilos = leitor.getStylesTable();
-
-            try (InputStream aba = leitor.getSheetsData().next()) {
-                XMLReader parser = XMLHelper.newXMLReader();
-                parser.setContentHandler(new XSSFSheetXMLHandler(
-                        estilos, textos,
-                        new ManipuladorLinhas(registrosExtraidos, limiteRegistros),
-                        false));
-
-                try {
+            Iterator<InputStream> abas = leitor.getSheetsData();
+            if (!abas.hasNext()) throw new IOException("A planilha não contém abas.");
+            while (abas.hasNext()) {
+                try (InputStream aba = abas.next()) {
+                    XMLReader parser = XMLHelper.newXMLReader();
+                    ManipuladorLinhas manipulador = new ManipuladorLinhas(
+                            processador, total, limiteRegistros, ignorarPrimeiros);
+                    parser.setContentHandler(new XSSFSheetXMLHandler(estilos, textos, manipulador, false));
                     parser.parse(new InputSource(aba));
-                } catch (LimiteAtingido e) {
-                    System.out.println("Limite de " + limiteRegistros + " registros atingido");
+                    if (!manipulador.cabecalhoLido) throw new IOException("A aba não contém o cabeçalho esperado.");
                 }
             }
-
-            printarLinhas();
-            System.out.println("Leitura do arquivo finalizada");
-            printarLinhas();
-
+        } catch (LimiteAtingido e) {
+            completa = false;
+        } catch (FalhaSql e) {
+            throw (SQLException) e.getCause();
+        } catch (IOException e) {
+            throw e;
         } catch (Exception e) {
-            System.out.println("Erro ao ler o arquivo: " + e.getMessage());
+            throw new IOException("Falha ao ler a planilha: " + e.getMessage(), e);
         }
-
-        return registrosExtraidos;
+        return new ResultadoLeitura(total[0], completa);
     }
 
     private class ManipuladorLinhas implements SheetContentsHandler {
-
-        private final List<RegistroCenso> registros;
+        private final ProcessadorRegistro<RegistroCenso> processador;
+        private final int[] total;
         private final int limite;
-        private final String[] valores = new String[TOTAL_COLUNAS];
+        private final int ignorarPrimeiros;
+        private final String[] valores = new String[COLUNAS.length];
+        private boolean cabecalhoLido;
 
-        ManipuladorLinhas(List<RegistroCenso> registros, int limite) {
-            this.registros = registros;
+        ManipuladorLinhas(ProcessadorRegistro<RegistroCenso> processador, int[] total,
+                int limite, int ignorarPrimeiros) {
+            this.processador = processador;
+            this.total = total;
             this.limite = limite;
+            this.ignorarPrimeiros = ignorarPrimeiros;
         }
 
         @Override
-        public void startRow(int rowNum) {
-            Arrays.fill(valores, null);
-        }
+        public void startRow(int rowNum) { Arrays.fill(valores, null); }
 
         @Override
-        public void cell(String referenciaCelula, String valor, XSSFComment comentario) {
-            if (referenciaCelula == null) {
-                return;
-            }
-            int coluna = new CellReference(referenciaCelula).getCol();
-            if (coluna < TOTAL_COLUNAS) {
-                valores[coluna] = valor;
-            }
+        public void cell(String referencia, String valor, XSSFComment comentario) {
+            if (referencia == null) return;
+            int coluna = new CellReference(referencia).getCol();
+            if (coluna < valores.length) valores[coluna] = valor;
         }
 
         @Override
         public void endRow(int rowNum) {
-            if (rowNum == 0) {
-                printarCabecalho(valores);
+            if (!cabecalhoLido) {
+                for (int i = 0; i < COLUNAS.length; i++) {
+                    if (!COLUNAS[i].equals(lerTexto(valores[i]))) {
+                        throw new IllegalArgumentException("Cabeçalho inválido na coluna " + (i + 1) + "; esperado " + COLUNAS[i] + ".");
+                    }
+                }
+                cabecalhoLido = true;
                 return;
             }
-            if (registros.size() >= limite) {
-                throw new LimiteAtingido();
+            if (Arrays.stream(valores).allMatch(valor -> valor == null || valor.isBlank())) return;
+            if (limite > 0 && total[0] >= limite) throw new LimiteAtingido();
+            int numero = ++total[0];
+            if (numero <= ignorarPrimeiros) return;
+            try {
+                RegistroCenso registro = montarRegistro(valores);
+                if (registro.getAnoCenso() == null || registro.getAnoCenso() < 1900 || registro.getAnoCenso() > 2100) {
+                    throw new IllegalArgumentException("Ano do censo inválido.");
+                }
+                if (registro.getModalidadeEnsino() == null || registro.getModalidadeEnsino() < 1 || registro.getModalidadeEnsino() > 2) {
+                    throw new IllegalArgumentException("Modalidade de ensino inválida.");
+                }
+                processador.processar(registro, numero);
+            } catch (SQLException e) {
+                throw new FalhaSql(e);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Linha " + (rowNum + 1) + ": " + e.getMessage(), e);
             }
-            System.out.println("Lendo linha " + rowNum);
-            registros.add(montarRegistro(valores));
         }
     }
 
     private RegistroCenso montarRegistro(String[] v) {
-        return new RegistroCenso(
-                lerInteiro(v[0]),   // NU_ANO_CENSO
-                lerTexto(v[1]),     // NO_MUNICIPIO
-                lerInteiro(v[2]),   // CO_IES
-                lerTexto(v[3]),     // NO_CINE_AREA_GERAL
-                lerTexto(v[4]),     // NO_CINE_AREA_ESPECIFICA
-                lerInteiro(v[5]),   // TP_MODALIDADE_ENSINO
-                lerInteiro(v[6]),   // QT_VG_TOTAL
-                lerInteiro(v[7]),   // QT_INSCRITO_TOTAL
-                lerInteiro(v[8]),   // QT_ING
-                lerInteiro(v[9]),   // QT_MAT
-                lerInteiro(v[10]),  // QT_MAT_0_17
-                lerInteiro(v[11]),  // QT_MAT_18_24
-                lerInteiro(v[12]),  // QT_MAT_25_29
-                lerInteiro(v[13]),  // QT_MAT_30_34
-                lerInteiro(v[14]),  // QT_MAT_35_39
-                lerInteiro(v[15]),  // QT_MAT_40_49
-                lerInteiro(v[16]),  // QT_MAT_50_59
-                lerInteiro(v[17]),  // QT_MAT_60_MAIS
-                lerInteiro(v[18])   // QT_CONC
-        );
-    }
-
-    private void printarCabecalho(String[] colunas) {
-        printarLinhas();
-        System.out.println("Lendo cabeçalho");
-        for (int i = 0; i < TOTAL_COLUNAS; i++) {
-            System.out.println("Coluna " + i + ": " + colunas[i]);
+        Integer[] numeros = new Integer[COLUNAS.length];
+        for (int i = 0; i < v.length; i++) {
+            if (i == 1 || i == 3 || i == 4) continue;
+            numeros[i] = lerInteiro(v[i]);
+            if (numeros[i] != null && numeros[i] < 0) throw new IllegalArgumentException("Contagem negativa em " + COLUNAS[i] + ".");
         }
-        printarLinhas();
+        return new RegistroCenso(numeros[0], lerTexto(v[1]), numeros[2], lerTexto(v[3]),
+                lerTexto(v[4]), numeros[5], numeros[6], numeros[7], numeros[8], numeros[9],
+                numeros[10], numeros[11], numeros[12], numeros[13], numeros[14], numeros[15],
+                numeros[16], numeros[17], numeros[18]);
     }
 }

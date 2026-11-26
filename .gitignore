@@ -1,6 +1,5 @@
 # Credenciais e configuracoes locais (mantenha exemplos versionados).
 .env
-.env.*
 !.env.example
 !**/.env.example
 *.env
@@ -49,3 +48,13 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Materiais e ferramentas mantidos apenas no ambiente de desenvolvimento.
+/PRD*.md
+/MinervaProject/test/
+/MinervaProject/tests/
+/apachePoi/src/test/
+*.test.js
+*.spec.js
+/package-lock.json
+dependency-reduced-pom.xml

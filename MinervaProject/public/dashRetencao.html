@@ -12,8 +12,7 @@
   <link rel="stylesheet" href="css/dash.css">
   <script src="js/kpi-tooltips.js" defer></script>
 </head>
-<body>
-
+<body data-dashboard="retencao">
   <aside class="sidebar">
     <a href="index.html" class="sidebar__link-logo" aria-label="Ir para a página inicial">
       <img class="sidebar__logo" src="imgs/logo_dash.png" alt="Logo M&C">
@@ -50,167 +49,112 @@
       </a>
     </nav>
   </aside>
-
   <div class="conteudo">
-
     <main class="principal">
-
       <div class="cabecalho">
         <div>
           <h1 class="titulo">RETENÇÃO</h1>
-          <p class="subtitulo">Onde existem sinais de dificuldade de conclusão?</p>
+          <p class="subtitulo">Compare os totais de ingressantes e concluintes por modalidade e área.</p>
         </div>
-
       </div>
-
-      <section class="cards cards--2">
-        <div class="card">
-          <div class="card__cabecalho">
-            <span class="card__rotulo">TAXA DE CRESCIMENTO DE CONCLUINTES</span>
-            <span class="kpi-ajuda">
-              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculada a taxa de crescimento de concluintes?" aria-describedby="tooltip-crescimento-concluintes" aria-expanded="false">?</button>
-              <span class="kpi-tooltip" id="tooltip-crescimento-concluintes" role="tooltip" hidden>
-                <strong class="kpi-tooltip__titulo">Taxa de crescimento de concluintes</strong>
-                <span>Indica o aumento ou a redução do número de concluintes em relação ao ano anterior.</span>
-                <span class="kpi-tooltip__formula">(Concluintes do ano atual − Concluintes do ano anterior) ÷ Concluintes do ano anterior × 100.</span>
-                <span class="kpi-tooltip__exemplo">Exemplo: (5.400 − 5.000) ÷ 5.000 × 100 = 8%.</span>
-              </span>
-            </span>
-          </div>
-          <strong class="card__valor card__valor--verde">▲ 8%</strong>
+      <form id="dashboardFiltros" class="dashboard-filtros" aria-label="Filtros da análise">
+        <div class="filtros__cabecalho">
+          <h2>Filtros da análise</h2>
+          <p>Escolha o recorte e aplique para atualizar os resultados.</p>
         </div>
-
-        <div class="card card--barras">
-          <div class="card__cabecalho">
-            <span class="card__rotulo">CONCLUSÃO POR SEGMENTO</span>
-            <span class="kpi-ajuda">
-              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculada a conclusão por segmento?" aria-describedby="tooltip-conclusao-segmento" aria-expanded="false">?</button>
-              <span class="kpi-tooltip" id="tooltip-conclusao-segmento" role="tooltip" hidden>
-                <strong class="kpi-tooltip__titulo">Conclusão por segmento</strong>
-                <span>Mostra a relação entre os totais de concluintes e ingressantes, calculada separadamente para as modalidades Presencial e EAD.</span>
-                <span class="kpi-tooltip__formula">Soma de concluintes ÷ Soma de ingressantes × 100, em cada modalidade.</span>
-                <span class="kpi-tooltip__exemplo">Exemplo no Presencial: 4.800 concluintes ÷ 10.000 ingressantes × 100 = 48%.</span>
-              </span>
-            </span>
-          </div>
-
-          <div class="barras">
-            <div class="barra">
-              <span class="barra__nome">Presencial</span>
-              <div class="barra__trilho">
-                <div class="barra__preenchimento" style="--valor: 48%">48%</div>
+        <fieldset id="dashboardCampos" disabled>
+          <legend class="visualmente-oculto">Definir filtros</legend>
+          <div class="filtros__secoes">
+            <div class="filtros__secao">
+              <h3>Período</h3>
+              <div class="filtros__linha"><input type="hidden" id="anoInicio" name="anoInicio">
+                <label for="anoFim">Ano de referência<select id="anoFim" name="anoFim"><option value="">Carregando…</option></select></label>
               </div>
+              <p id="periodoAjuda" class="filtros__ajuda">Carregando os anos disponíveis…</p>
             </div>
-
-            <div class="barra">
-              <span class="barra__nome">EAD</span>
-              <div class="barra__trilho">
-                <div class="barra__preenchimento" style="--valor: 38%">38%</div>
+            <div class="filtros__secao">
+              <h3>Localização</h3>
+              <div class="filtros__linha filtros__linha--local">
+                <label for="regiao">Região<select id="regiao" name="regiao"><option value="">Todas as regiões</option></select></label>
+                <label for="uf">Estado<select id="uf" name="uf"><option value="">Todos os estados</option></select></label>
+                <label for="localizacao">Município<select id="localizacao" name="localizacao"><option value="">Todos os municípios</option></select></label>
+              </div>
+              <p id="geografiaAjuda" class="filtros__ajuda"></p>
+              <details class="filtros__metodo"><summary>Sobre a localização</summary>
+                <p>Quando falta a UF no cadastro, usamos a referência do IBGE somente se o nome identificar um único município. Nomes homônimos continuam como não identificados.</p>
+              </details>
+            </div>
+            <div class="filtros__secao">
+              <h3>Ensino</h3>
+              <div class="filtros__linha filtros__linha--ensino">
+                <label for="modalidade">Modalidade<select id="modalidade" name="modalidade"><option value="">Todas as modalidades</option></select></label>
+                <label for="area">Área de conhecimento<select id="area" name="area"><option value="">Todas as áreas</option></select></label>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <h2 class="grafico__titulo">Conclusão por Área</h2>
-      <section class="grafico grafico--alto">
-        <canvas id="graficoAreas"></canvas>
-      </section>
+          <div class="filtros__rodape">
+            <p class="filtros__ajuda">— significa que não há informação suficiente para calcular o indicador.</p>
+            <div class="filtros__acoes">
+              <button type="button" id="dashboardLimpar" class="dashboard-botao dashboard-botao--secundario">Restaurar filtros</button>
+              <button type="submit" class="dashboard-botao">Aplicar filtros</button>
+            </div>
+          </div>
+        </fieldset>
+        <p id="filtrosPendentes" class="filtros__pendentes" role="status" hidden></p>
+      </form>
+      <div class="dashboard-contexto">
+        <p id="dashboardContexto">Carregando o período e os indicadores…</p>
+        <p id="dashboardRecorte"></p>
+      </div>
+      <div id="dashboardEstado" class="dashboard-estado" data-estado="carregando" role="status" aria-live="polite" aria-atomic="true">
+        <span id="dashboardMensagem">Carregando os dados do painel…</span>
+        <button type="button" id="dashboardTentar" class="dashboard-botao dashboard-botao--secundario" hidden>Tentar novamente</button>
+      </div>
+      <ul id="dashboardObservacoes" class="dashboard-observacoes" hidden></ul>
+      <div id="dashboardResultados" aria-busy="true">
+        <section class="cards cards--2" aria-label="Indicadores de retenção">
+          <div class="card">
+            <div class="card__cabecalho">
+              <span class="card__rotulo">VARIAÇÃO DE CONCLUINTES</span>
+              <span class="kpi-ajuda">
+                <button type="button" class="kpi-ajuda__botao" aria-label="Entenda: Variação de concluintes" aria-describedby="tooltip-crescimento-concluintes" aria-expanded="false">?</button>
+                <span class="kpi-tooltip" id="tooltip-crescimento-concluintes" role="tooltip" hidden>
+                  <strong class="kpi-tooltip__titulo">Variação de concluintes</strong>
+                  <span>Variação dos concluintes do último ano selecionado em relação ao ano calendário anterior.</span>
+                  <span class="kpi-tooltip__formula">(Concluintes do ano de referência − Concluintes do ano anterior) ÷ Concluintes do ano anterior × 100.</span>
+                  <span class="kpi-tooltip__exemplo">O ano anterior é consultado mesmo quando estiver fora do intervalo escolhido. Sem ano anterior ou base positiva, a taxa aparece como —.</span>
+                </span>
+              </span>
+            </div>
+            <strong id="kpiConcluintes" data-kpi class="card__valor ">—</strong>
+          </div>
+          <div class="card card--barras">
+            <div class="card__cabecalho">
+              <span class="card__rotulo">CONCLUINTES / INGRESSANTES</span>
+              <span class="kpi-ajuda">
+                <button type="button" class="kpi-ajuda__botao" aria-label="Entenda: Relação concluintes/ingressantes" aria-describedby="tooltip-conclusao-segmento" aria-expanded="false">?</button>
+                <span class="kpi-tooltip" id="tooltip-conclusao-segmento" role="tooltip" hidden>
+                  <strong class="kpi-tooltip__titulo">Relação concluintes/ingressantes</strong>
+                  <span>Relação entre concluintes e ingressantes em cada modalidade, no último ano selecionado.</span>
+                  <span class="kpi-tooltip__formula">Concluintes ÷ Ingressantes × 100, em cada modalidade.</span>
+                  <span class="kpi-tooltip__exemplo">É uma relação entre totais do mesmo ano, sem acompanhamento de uma turma. A taxa pode superar 100%; o preenchimento visual da barra fica limitado a 100%.</span>
+                </span>
+              </span>
+            </div>
+            <div id="barrasSegmentos" class="barras"></div>
+          </div>
+        </section>
+        <p class="dashboard-nota">A relação entre concluintes e ingressantes compara totais do mesmo ano. Não representa o acompanhamento de uma turma nem uma taxa de evasão.</p>
+        <h2 id="tituloAreas" class="grafico__titulo">Ingressantes e concluintes por área no ano de referência</h2>
+        <section class="grafico grafico--alto" aria-label="Ingressantes e concluintes por área">
+          <canvas id="graficoAreas" role="img" aria-label="Ingressantes e concluintes por área" hidden></canvas>
+          <p id="graficoVazio" class="grafico__vazio" hidden></p>
+        </section>
+      </div>
     </main>
   </div>
-
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script>
-    const areas = [
-      "Educação", "Saúde", "Tecnologia", "Engenharia",
-      "Agricultura", "Artes", "Negócios", "Serviços"
-    ];
-
-    // valores de exemplo: trocar pelos dados reais
-    const ingressantes = [2200, 3200, 4000, 2800, 1200, 1500, 3000, 1800];
-    const concluintes  = [1300, 1700, 2500, 1500,  700,  900, 1600, 1000];
-
-    const corIngressantes = "#59534E";   
-    const corConcluintes  = "#D4A94C";   
-    const tamanhoFonte = window.innerWidth <= 700 ? 10 : 13;
-
-    const canvas = document.getElementById("graficoAreas");
-
-    new Chart(canvas, {
-      type: "bar",
-      data: {
-        labels: areas,
-        datasets: [
-          {
-            label: "Qtd. Ingressantes",
-            data: ingressantes,
-            backgroundColor: corIngressantes,
-            borderRadius: 6,
-            borderSkipped: false
-          },
-          {
-            label: "Qtd. Concluintes",
-            data: concluintes,
-            backgroundColor: corConcluintes,
-            borderRadius: 6,
-            borderSkipped: false
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "top",
-            labels: {
-              usePointStyle: true,
-              pointStyle: "circle",
-              boxWidth: 8,
-              font: { size: tamanhoFonte, family: "Montserrat" },
-              color: "#59534E"
-            }
-          }
-        },
-        scales: {
-          y: {
-            min: 0,
-            max: 4000,
-            ticks: {
-              stepSize: 1000,
-              font: { size: tamanhoFonte, family: "Montserrat" },
-              color: "#59534E",
-              callback: (valor) => valor.toLocaleString("pt-BR")  // 4.000
-            },
-            grid: { color: "#E4DFD7" },
-            border: { display: false }
-          },
-          x: {
-            ticks: {
-              font: { size: tamanhoFonte, family: "Montserrat" },
-              color: "#59534E"
-            },
-            grid: { display: false }
-          }
-        }
-      }
-    });
-  </script>
-  <script>
-    (() => {
-      const usuarioDashboard = JSON.parse(sessionStorage.getItem("usuario"));
-      const fotoPerfilDashboard = document.getElementById("fotoPerfilDashboard");
-
-      if (usuarioDashboard?.foto) {
-        fotoPerfilDashboard.src = `/imgs/${usuarioDashboard.foto}.png`;
-      }
-
-      document.getElementById("logoutDashboard").addEventListener("click", (evento) => {
-        evento.preventDefault();
-        logout();
-      });
-    })();
-  </script>
-    <script src="js/backIni/sessionStorage.js"></script>
+  <script src="js/backIni/sessionStorage.js"></script>
+  <script src="js/dashboard.js"></script>
 </body>
 </html>

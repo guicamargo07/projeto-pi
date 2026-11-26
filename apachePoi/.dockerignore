@@ -5,3 +5,8 @@ target/
 *.xlsx
 dependency-reduced-pom.xml
 *.iml
+src/test/
+.env
+.env.*
+*.env
+*.log

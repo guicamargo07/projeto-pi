@@ -15,9 +15,7 @@
 
 
 </head>
-
-<body>
-
+<body data-dashboard="geral">
   <aside class="sidebar">
     <a href="index.html" class="sidebar__link-logo" aria-label="Ir para a página inicial">
       <img class="sidebar__logo" src="imgs/logo_dash.png" alt="Logo M&C">
@@ -71,161 +69,127 @@
       </a>
     </nav>
   </aside>
-
   <div class="conteudo">
-
     <main class="principal">
-
       <div class="cabecalho">
         <div>
           <h1 class="titulo">VISÃO GERAL</h1>
-          <p class="subtitulo">Como está a minha instituição atualmente?</p>
+          <p class="subtitulo">Como está a educação superior no recorte selecionado?</p>
         </div>
-
-
       </div>
-
-      <section class="cards">
-        <div class="card">
-          <div class="card__cabecalho">
-            <span class="card__rotulo">TAXA DE OCUPAÇÃO</span>
-            <span class="kpi-ajuda">
-              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculada a taxa de ocupação?" aria-describedby="tooltip-ocupacao" aria-expanded="false">?</button>
-              <span class="kpi-tooltip" id="tooltip-ocupacao" role="tooltip" hidden>
-                <strong class="kpi-tooltip__titulo">Taxa de ocupação</strong>
-                <span>Mostra o percentual das vagas ofertadas que foram preenchidas por ingressantes.</span>
-                <span class="kpi-tooltip__formula">Ingressantes ÷ Vagas ofertadas × 100.</span>
-                <span class="kpi-tooltip__exemplo">Exemplo: 400 ingressantes ÷ 2.000 vagas × 100 = 20%.</span>
-              </span>
-            </span>
-          </div>
-          <!-- id adicionado: o JS troca a cor conforme o valor -->
-          <strong id="kpiOcupacao" class="card__valor">75%</strong>
+      <form id="dashboardFiltros" class="dashboard-filtros" aria-label="Filtros da análise">
+        <div class="filtros__cabecalho">
+          <h2>Filtros da análise</h2>
+          <p>Escolha o recorte e aplique para atualizar os resultados.</p>
         </div>
-
-        <div class="card">
-          <div class="card__cabecalho">
-            <span class="card__rotulo">TAXA DE CRESCIMENTO</span>
-            <span class="kpi-ajuda">
-              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculada a taxa de crescimento?" aria-describedby="tooltip-crescimento" aria-expanded="false">?</button>
-              <span class="kpi-tooltip" id="tooltip-crescimento" role="tooltip" hidden>
-                <strong class="kpi-tooltip__titulo">Taxa de crescimento</strong>
-                <span>Indica o aumento ou a redução do número de matrículas em relação ao ano anterior.</span>
-                <span class="kpi-tooltip__formula">(Matrículas do ano atual − Matrículas do ano anterior) ÷ Matrículas do ano anterior × 100.</span>
-                <span class="kpi-tooltip__exemplo">Exemplo: (11.000 − 10.000) ÷ 10.000 × 100 = 10%.</span>
-              </span>
-            </span>
+        <fieldset id="dashboardCampos" disabled>
+          <legend class="visualmente-oculto">Definir filtros</legend>
+          <div class="filtros__secoes">
+            <div class="filtros__secao">
+              <h3>Período</h3>
+              <div class="filtros__linha"><label for="anoInicio">De<select id="anoInicio" name="anoInicio"><option value="">Carregando…</option></select></label>
+                <label for="anoFim">Até<select id="anoFim" name="anoFim"><option value="">Carregando…</option></select></label>
+              </div>
+              <p id="periodoAjuda" class="filtros__ajuda">Carregando os anos disponíveis…</p>
+            </div>
+            <div class="filtros__secao">
+              <h3>Localização</h3>
+              <div class="filtros__linha filtros__linha--local">
+                <label for="regiao">Região<select id="regiao" name="regiao"><option value="">Todas as regiões</option></select></label>
+                <label for="uf">Estado<select id="uf" name="uf"><option value="">Todos os estados</option></select></label>
+                <label for="localizacao">Município<select id="localizacao" name="localizacao"><option value="">Todos os municípios</option></select></label>
+              </div>
+              <p id="geografiaAjuda" class="filtros__ajuda"></p>
+              <details class="filtros__metodo"><summary>Sobre a localização</summary>
+                <p>Quando falta a UF no cadastro, usamos a referência do IBGE somente se o nome identificar um único município. Nomes homônimos continuam como não identificados.</p>
+              </details>
+            </div>
+            <div class="filtros__secao">
+              <h3>Ensino</h3>
+              <div class="filtros__linha filtros__linha--ensino">
+                <label for="modalidade">Modalidade<select id="modalidade" name="modalidade"><option value="">Todas as modalidades</option></select></label>
+                <label for="area">Área de conhecimento<select id="area" name="area"><option value="">Todas as áreas</option></select></label>
+              </div>
+            </div>
           </div>
-          <strong class="card__valor card__valor--verde">▲ 4,2%</strong>
-        </div>
-
-        <div class="card">
-          <div class="card__cabecalho">
-            <span class="card__rotulo">PÚBLICO PREDOMINANTE</span>
-            <span class="kpi-ajuda">
-              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculado o público predominante?" aria-describedby="tooltip-publico" aria-expanded="false">?</button>
-              <span class="kpi-tooltip" id="tooltip-publico" role="tooltip" hidden>
-                <strong class="kpi-tooltip__titulo">Público predominante</strong>
-                <span>Compara a quantidade de matrículas das oito faixas etárias e apresenta aquela com o maior número de matrículas.</span>
-                <span class="kpi-tooltip__formula">Público predominante = faixa etária com mais matrículas.</span>
-                <span class="kpi-tooltip__exemplo">São comparadas as faixas: até 17 anos, 18–24, 25–29, 30–34, 35–39, 40–49, 50–59 e 60 anos ou mais.</span>
-              </span>
-            </span>
+          <div class="filtros__rodape">
+            <p class="filtros__ajuda">— significa que não há informação suficiente para calcular o indicador.</p>
+            <div class="filtros__acoes">
+              <button type="button" id="dashboardLimpar" class="dashboard-botao dashboard-botao--secundario">Restaurar filtros</button>
+              <button type="submit" class="dashboard-botao">Aplicar filtros</button>
+            </div>
           </div>
-          <strong class="card__valor card__valor--azul card__valor--menor">18 - 24 Anos</strong>
-        </div>
-      </section>
-
-      <h2 class="grafico__titulo">Evolução de matrículas</h2>
-      <section class="grafico">
-        <canvas id="graficoMatriculas"></canvas>
-      </section>
+        </fieldset>
+        <p id="filtrosPendentes" class="filtros__pendentes" role="status" hidden></p>
+      </form>
+      <div class="dashboard-contexto">
+        <p id="dashboardContexto">Carregando o período e os indicadores…</p>
+        <p id="dashboardRecorte"></p>
+      </div>
+      <div id="dashboardEstado" class="dashboard-estado" data-estado="carregando" role="status" aria-live="polite" aria-atomic="true">
+        <span id="dashboardMensagem">Carregando os dados do painel…</span>
+        <button type="button" id="dashboardTentar" class="dashboard-botao dashboard-botao--secundario" hidden>Tentar novamente</button>
+      </div>
+      <ul id="dashboardObservacoes" class="dashboard-observacoes" hidden></ul>
+      <div id="dashboardResultados" aria-busy="true">
+        <section class="cards" aria-label="Indicadores de visão geral">
+          <div class="card">
+            <div class="card__cabecalho">
+              <span class="card__rotulo">TAXA DE OCUPAÇÃO</span>
+              <span class="kpi-ajuda">
+                <button type="button" class="kpi-ajuda__botao" aria-label="Entenda: Taxa de ocupação" aria-describedby="tooltip-ocupacao" aria-expanded="false">?</button>
+                <span class="kpi-tooltip" id="tooltip-ocupacao" role="tooltip" hidden>
+                  <strong class="kpi-tooltip__titulo">Taxa de ocupação</strong>
+                  <span>Percentual das vagas ofertadas preenchidas por ingressantes no último ano selecionado.</span>
+                  <span class="kpi-tooltip__formula">Ingressantes ÷ Vagas ofertadas × 100.</span>
+                  <span class="kpi-tooltip__exemplo">Os indicadores usam o último ano selecionado, com os filtros aplicados. — indica dado ausente ou denominador sem base para o cálculo.</span>
+                </span>
+              </span>
+            </div>
+            <strong id="kpiOcupacao" data-kpi class="card__valor ">—</strong>
+          </div>
+          <div class="card">
+            <div class="card__cabecalho">
+              <span class="card__rotulo">Taxa de Matrículas</span>
+              <span class="kpi-ajuda">
+                <button type="button" class="kpi-ajuda__botao" aria-label="Entenda: Taxa de Matrículas" aria-describedby="tooltip-crescimento" aria-expanded="false">?</button>
+                <span class="kpi-tooltip" id="tooltip-crescimento" role="tooltip" hidden>
+                  <strong class="kpi-tooltip__titulo">Taxa de Matrículas</strong>
+                  <span>Variação das matrículas do último ano selecionado em relação ao ano calendário anterior.</span>
+                  <span class="kpi-tooltip__formula">(Matrículas do ano de referência − Matrículas do ano anterior) ÷ Matrículas do ano anterior × 100.</span>
+                  <span class="kpi-tooltip__exemplo">O ano anterior é consultado mesmo quando estiver fora do intervalo escolhido. Sem ano anterior ou base positiva, a taxa aparece como —.</span>
+                </span>
+              </span>
+            </div>
+            <strong id="kpiCrescimento" data-kpi class="card__valor ">—</strong>
+          </div>
+          <div class="card">
+            <div class="card__cabecalho">
+              <span class="card__rotulo">PÚBLICO PREDOMINANTE</span>
+              <span class="kpi-ajuda">
+                <button type="button" class="kpi-ajuda__botao" aria-label="Entenda: Público predominante" aria-describedby="tooltip-publico" aria-expanded="false">?</button>
+                <span class="kpi-tooltip" id="tooltip-publico" role="tooltip" hidden>
+                  <strong class="kpi-tooltip__titulo">Público predominante</strong>
+                  <span>Faixa etária com mais matrículas no último ano selecionado, acompanhada de sua participação no total.</span>
+                  <span class="kpi-tooltip__formula">Matrículas da faixa predominante ÷ Total de matrículas × 100.</span>
+                  <span class="kpi-tooltip__exemplo">Faixas comparadas: até 17 anos, 18–24, 25–29, 30–34, 35–39, 40–49, 50–59 e 60 anos ou mais.</span>
+                </span>
+              </span>
+            </div>
+            <strong id="kpiPublico" data-kpi class="card__valor card__valor--menor">—</strong>
+            <span id="publicoDetalhe" class="card__detalhe"></span>
+          </div>
+        </section>
+        <h2 class="grafico__titulo">Evolução de matrículas no período selecionado</h2>
+        <section class="grafico" aria-label="Evolução de matrículas">
+          <canvas id="graficoMatriculas" role="img" aria-label="Matrículas por ano" hidden></canvas>
+          <p id="graficoVazio" class="grafico__vazio" hidden></p>
+        </section>
+      </div>
     </main>
   </div>
-
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script>
-    const taxaDeOcupacao = 75; // trocar pelo valor real
-
-    const kpiOcupacao = document.getElementById("kpiOcupacao");
-    kpiOcupacao.textContent = taxaDeOcupacao + "%";
-
-    if (taxaDeOcupacao <= 44.9) {
-      kpiOcupacao.classList.add("card__valor--vermelho");
-    } else if (taxaDeOcupacao <= 50) {
-      kpiOcupacao.classList.add("card__valor--amarelo");
-    } else {
-      kpiOcupacao.classList.add("card__valor--verde");
-    }
-
-    const anos = [2019, 2020, 2021, 2022, 2023, 2024];
-    const matriculas = [80000, 40000, 25000, 43000, 52000, 56000];
-
-    const corLinha = "#D4A94C";
-    const canvas = document.getElementById("graficoMatriculas");
-    const tamanhoFonte = window.innerWidth <= 700 ? 11 : 14;
-
-    new Chart(canvas, {
-      type: "line",
-      data: {
-        labels: anos,
-        datasets: [
-          {
-            data: matriculas,
-            borderColor: corLinha,
-            backgroundColor: corLinha,
-            borderWidth: 4,
-            pointRadius: 5,
-            tension: 0
-
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: { padding: { top: 8, right: 10 } },
-        plugins: { legend: { display: false } },
-        scales: {
-          y: {
-            min: 0,
-            max: 80000,
-            ticks: {
-              stepSize: 20000,
-              font: { size: tamanhoFonte, family: "Montserrat" },
-              color: "#000",
-              callback: (valor) => (valor === 0 ? "0" : valor / 1000 + "mil")
-            },
-            grid: { color: "#d9d9d9" },
-            border: { display: false }
-          },
-          x: {
-            ticks: {
-              font: { size: tamanhoFonte, family: "Montserrat" },
-              color: "#000"
-            },
-            grid: { display: false }
-          }
-        }
-      }
-    });
-  </script>
-  <script>
-    (() => {
-      const usuarioDashboard = JSON.parse(sessionStorage.getItem("usuario"));
-      const fotoPerfilDashboard = document.getElementById("fotoPerfilDashboard");
-
-      if (usuarioDashboard?.foto) {
-        fotoPerfilDashboard.src = `/imgs/${usuarioDashboard.foto}.png`;
-      }
-
-      document.getElementById("logoutDashboard").addEventListener("click", (evento) => {
-        evento.preventDefault();
-        logout();
-      });
-    })();
-  </script>
-    <script src="js/backIni/sessionStorage.js"></script>
+  <script src="js/backIni/sessionStorage.js"></script>
+  <script src="js/dashboard.js"></script>
 </body>
-
 </html>

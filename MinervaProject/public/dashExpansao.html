@@ -12,8 +12,7 @@
   <link rel="stylesheet" href="css/dash.css">
   <script src="js/kpi-tooltips.js" defer></script>
 </head>
-<body>
-
+<body data-dashboard="expansao">
   <aside class="sidebar">
     <a href="index.html" class="sidebar__link-logo" aria-label="Ir para a página inicial">
       <img class="sidebar__logo" src="imgs/logo_dash.png" alt="Logo M&C">
@@ -50,124 +49,146 @@
       </a>
     </nav>
   </aside>
-
   <div class="conteudo">
-
-    </header>
-
     <main class="principal">
-
       <div class="cabecalho">
         <div>
           <h1 class="titulo">EXPANSÃO</h1>
           <p class="subtitulo">Onde o crescimento é favorável?</p>
         </div>
-
       </div>
-
-      <section class="cards">
-        <div class="card">
-          <div class="card__cabecalho">
-            <span class="card__rotulo">TAXA DE INTERESSE</span>
-            <span class="kpi-ajuda">
-              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculada a taxa de interesse?" aria-describedby="tooltip-interesse" aria-expanded="false">?</button>
-              <span class="kpi-tooltip" id="tooltip-interesse" role="tooltip" hidden>
-                <strong class="kpi-tooltip__titulo">Taxa de interesse</strong>
-                <span>Indica a quantidade de candidatos inscritos por vaga ofertada. O resultado é um número de candidatos por vaga.</span>
-                <span class="kpi-tooltip__formula">Inscritos ÷ Vagas ofertadas.</span>
-                <span class="kpi-tooltip__exemplo">Exemplo: 21.000 inscritos ÷ 5.000 vagas = 4,2 candidatos por vaga.</span>
-              </span>
-            </span>
-          </div>
-          <strong class="card__valor card__valor--azul">4,2</strong>
+      <form id="dashboardFiltros" class="dashboard-filtros" aria-label="Filtros da análise">
+        <div class="filtros__cabecalho">
+          <h2>Filtros da análise</h2>
+          <p>Escolha o recorte e aplique para atualizar os resultados.</p>
         </div>
-
-        <div class="card">
-          <div class="card__cabecalho">
-            <span class="card__rotulo">INSTITUIÇÕES COM OFERTA</span>
-            <span class="kpi-ajuda">
-              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculada a quantidade de instituições com oferta?" aria-describedby="tooltip-instituicoes" aria-expanded="false">?</button>
-              <span class="kpi-tooltip" id="tooltip-instituicoes" role="tooltip" hidden>
-                <strong class="kpi-tooltip__titulo">Instituições com oferta</strong>
-                <span>Apresenta a quantidade de instituições que ofertam cursos na região, no período e na modalidade selecionados, somando os registros filtrados.</span>
-                <span class="kpi-tooltip__formula">Soma da quantidade de instituições dos registros filtrados.</span>
-                <span class="kpi-tooltip__exemplo">Exemplo: 12 + 8 = 20 instituições.</span>
-              </span>
-            </span>
+        <fieldset id="dashboardCampos" disabled>
+          <legend class="visualmente-oculto">Definir filtros</legend>
+          <div class="filtros__secoes">
+            <div class="filtros__secao">
+              <h3>Período</h3>
+              <div class="filtros__linha"><label for="anoInicio">De<select id="anoInicio" name="anoInicio"><option value="">Carregando…</option></select></label>
+                <label for="anoFim">Até<select id="anoFim" name="anoFim"><option value="">Carregando…</option></select></label>
+              </div>
+              <p id="periodoAjuda" class="filtros__ajuda">Carregando os anos disponíveis…</p>
+            </div>
+            <div class="filtros__secao">
+              <h3>Localização</h3>
+              <div class="filtros__linha filtros__linha--local">
+                <label for="regiao">Região<select id="regiao" name="regiao"><option value="">Todas as regiões</option></select></label>
+                <label for="uf">Estado<select id="uf" name="uf"><option value="">Todos os estados</option></select></label>
+                <label for="localizacao">Município<select id="localizacao" name="localizacao"><option value="">Todos os municípios</option></select></label>
+              </div>
+              <p id="geografiaAjuda" class="filtros__ajuda"></p>
+              <details class="filtros__metodo"><summary>Sobre a localização</summary>
+                <p>Quando falta a UF no cadastro, usamos a referência do IBGE somente se o nome identificar um único município. Nomes homônimos continuam como não identificados.</p>
+              </details>
+            </div>
+            <div class="filtros__secao">
+              <h3>Ensino</h3>
+              <div class="filtros__linha filtros__linha--ensino">
+                <label for="modalidade">Modalidade<select id="modalidade" name="modalidade"><option value="">Todas as modalidades</option></select></label>
+                <label for="area">Área de conhecimento<select id="area" name="area"><option value="">Todas as áreas</option></select></label>
+              </div>
+            </div>
           </div>
-          <strong class="card__valor">20</strong>
-        </div>
-
-        <div class="card">
-          <div class="card__cabecalho">
-            <span class="card__rotulo">TOTAL DE VAGAS</span>
-            <span class="kpi-ajuda">
-              <button type="button" class="kpi-ajuda__botao" aria-label="Como é calculado o total de vagas?" aria-describedby="tooltip-vagas" aria-expanded="false">?</button>
-              <span class="kpi-tooltip" id="tooltip-vagas" role="tooltip" hidden>
-                <strong class="kpi-tooltip__titulo">Total de vagas</strong>
-                <span>Apresenta o total de vagas ofertadas no recorte selecionado, somando as vagas de todos os registros filtrados.</span>
-                <span class="kpi-tooltip__formula">Soma das vagas ofertadas dos registros filtrados.</span>
-                <span class="kpi-tooltip__exemplo">Exemplo: 2.869 + 2.000 = 4.869 vagas.</span>
-              </span>
-            </span>
+          <div class="filtros__rodape">
+            <p class="filtros__ajuda">— significa que não há informação suficiente para calcular o indicador.</p>
+            <div class="filtros__acoes">
+              <button type="button" id="dashboardLimpar" class="dashboard-botao dashboard-botao--secundario">Restaurar filtros</button>
+              <button type="submit" class="dashboard-botao">Aplicar filtros</button>
+            </div>
           </div>
-          <strong class="card__valor card__valor--azul">4.869</strong>
-        </div>
-      </section>
-
-      <h2 class="grafico__titulo">Mercados em crescimento</h2>
-
+        </fieldset>
+        <p id="filtrosPendentes" class="filtros__pendentes" role="status" hidden></p>
+      </form>
+      <div class="dashboard-contexto">
+        <p id="dashboardContexto">Carregando o período e os indicadores…</p>
+        <p id="dashboardRecorte"></p>
+      </div>
+      <div id="dashboardEstado" class="dashboard-estado" data-estado="carregando" role="status" aria-live="polite" aria-atomic="true">
+        <span id="dashboardMensagem">Carregando os dados do painel…</span>
+        <button type="button" id="dashboardTentar" class="dashboard-botao dashboard-botao--secundario" hidden>Tentar novamente</button>
+      </div>
+      <ul id="dashboardObservacoes" class="dashboard-observacoes" hidden></ul>
+      <div id="dashboardResultados" aria-busy="true">
+        <section class="cards" aria-label="Indicadores de expansão">
+          <div class="card">
+            <div class="card__cabecalho">
+              <span class="card__rotulo">INSCRITOS POR VAGA</span>
+              <span class="kpi-ajuda">
+                <button type="button" class="kpi-ajuda__botao" aria-label="Entenda: Inscritos por vaga" aria-describedby="tooltip-interesse" aria-expanded="false">?</button>
+                <span class="kpi-tooltip" id="tooltip-interesse" role="tooltip" hidden>
+                  <strong class="kpi-tooltip__titulo">Inscritos por vaga</strong>
+                  <span>Quantidade de candidatos inscritos por vaga ofertada no último ano selecionado.</span>
+                  <span class="kpi-tooltip__formula">Inscritos ÷ Vagas ofertadas.</span>
+                  <span class="kpi-tooltip__exemplo">São os inscritos informados pela base, não uma contagem de pessoas únicas entre cursos. Sem vagas como base, o resultado aparece como —.</span>
+                </span>
+              </span>
+            </div>
+            <strong id="kpiInteresse" data-kpi class="card__valor ">—</strong>
+            <span class="card__detalhe">inscritos por vaga</span>
+          </div>
+          <div class="card">
+            <div class="card__cabecalho">
+              <span class="card__rotulo">INSTITUIÇÕES COM OFERTA</span>
+              <span class="kpi-ajuda">
+                <button type="button" class="kpi-ajuda__botao" aria-label="Entenda: Instituições com oferta" aria-describedby="tooltip-instituicoes" aria-expanded="false">?</button>
+                <span class="kpi-tooltip" id="tooltip-instituicoes" role="tooltip" hidden>
+                  <strong class="kpi-tooltip__titulo">Instituições com oferta</strong>
+                  <span>Quantidade de instituições com oferta no último ano selecionado, respeitando os filtros.</span>
+                  <span class="kpi-tooltip__formula">Total de instituições com oferta no ano de referência.</span>
+                  <span class="kpi-tooltip__exemplo">Na base de cursos, cada instituição com vagas é contada uma vez. Em dados consolidados, o total soma as quantidades dos registros e pode conter sobreposições, sinalizadas no painel.</span>
+                </span>
+              </span>
+            </div>
+            <strong id="kpiInstituicoes" data-kpi class="card__valor ">—</strong>
+          </div>
+          <div class="card">
+            <div class="card__cabecalho">
+              <span class="card__rotulo">TOTAL DE VAGAS</span>
+              <span class="kpi-ajuda">
+                <button type="button" class="kpi-ajuda__botao" aria-label="Entenda: Total de vagas" aria-describedby="tooltip-vagas" aria-expanded="false">?</button>
+                <span class="kpi-tooltip" id="tooltip-vagas" role="tooltip" hidden>
+                  <strong class="kpi-tooltip__titulo">Total de vagas</strong>
+                  <span>Total de vagas ofertadas no último ano selecionado, respeitando os filtros.</span>
+                  <span class="kpi-tooltip__formula">Soma das vagas ofertadas dos registros filtrados no ano de referência.</span>
+                  <span class="kpi-tooltip__exemplo">Os indicadores usam o último ano selecionado, com os filtros aplicados. — indica dado ausente ou denominador sem base para o cálculo.</span>
+                </span>
+              </span>
+            </div>
+            <strong id="kpiVagas" data-kpi class="card__valor ">—</strong>
+          </div>
+        </section>
+        <h2 id="tituloMercados" class="grafico__titulo">Variação de matrículas por município</h2>
+        <p class="dashboard-nota">Variação das matrículas entre os dois anos selecionados, por modalidade. Os inscritos por vaga são calculados no ano final.</p>
+        <div class="tabela-controles">
+        <label for="buscarMunicipioTabela">Buscar município<input type="search" id="buscarMunicipioTabela" placeholder="Nome do município ou UF" autocomplete="off"></label>
+        <label for="ordenarMercados">Ordenar por<select id="ordenarMercados"><option value="presencial">Maior variação presencial</option><option value="ead">Maior variação EAD</option><option value="municipio">Nome do município</option></select></label>
+      </div>
       <div class="tabela-wrapper">
-        <table class="tabela">
-          <thead>
-            <tr>
-              <th>Município</th>
-              <th>Cres. Presencial</th>
-              <th>Cres. EAD</th>
-              <th>Interesse</th>
-            </tr>
-          </thead>
-          <tbody id="corpoTabela"></tbody>
-        </table>
+          <table class="tabela">
+            <caption class="visualmente-oculto">Variação de matrículas e inscritos por vaga por município</caption>
+            <thead>
+              <tr>
+                <th scope="col">Município / UF</th>
+                <th scope="col">Variação presencial</th>
+                <th scope="col">Variação EAD</th>
+                <th scope="col">Inscritos por vaga</th>
+              </tr>
+            </thead>
+            <tbody id="corpoTabela"></tbody>
+          </table>
+        </div>
+      <div class="tabela-paginacao">
+        <span id="tabelaContagem" role="status"></span>
+        <div><button type="button" id="paginaAnterior" class="dashboard-botao dashboard-botao--secundario" disabled>Anterior</button>
+        <button type="button" id="paginaSeguinte" class="dashboard-botao dashboard-botao--secundario" disabled>Próxima</button></div>
+      </div>
       </div>
     </main>
   </div>
-
-  <script>
-    const mercados = [
-      { municipio: "Campinas",       presencial: 15, ead: 5, interesse: 4.2 },
-      { municipio: "Ribeirão Preto", presencial: 12, ead: 7, interesse: 3.8 },
-      { municipio: "Sorocaba",       presencial: 9,  ead: 6, interesse: 3.5 },
-      { municipio: "Santos",         presencial: 8,  ead: 7, interesse: 3.1 }
-    ];
-
-    const formatarNota = (n) => n.toFixed(1).replace(".", ",");
-    const formatarCres = (n) => (n >= 0 ? "+" : "") + n + "%";
-
-    document.getElementById("corpoTabela").innerHTML = mercados.map((m) => `
-      <tr>
-        <td>${m.municipio}</td>
-        <td class="tabela__positivo">${formatarCres(m.presencial)}</td>
-        <td class="tabela__positivo">${formatarCres(m.ead)}</td>
-        <td class="tabela__interesse">${formatarNota(m.interesse)}</td>
-      </tr>
-    `).join("");
-  </script>
-  <script>
-    (() => {
-      const usuarioDashboard = JSON.parse(sessionStorage.getItem("usuario"));
-      const fotoPerfilDashboard = document.getElementById("fotoPerfilDashboard");
-
-      if (usuarioDashboard?.foto) {
-        fotoPerfilDashboard.src = `/imgs/${usuarioDashboard.foto}.png`;
-      }
-
-      document.getElementById("logoutDashboard").addEventListener("click", (evento) => {
-        evento.preventDefault();
-        logout();
-      });
-    })();
-  </script>
-    <script src="js/backIni/sessionStorage.js"></script>
+  <script src="js/backIni/sessionStorage.js"></script>
+  <script src="js/dashboard.js"></script>
 </body>
 </html>

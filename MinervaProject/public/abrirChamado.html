@@ -8,7 +8,8 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dash.css">
     <link rel="stylesheet" href="css/suporte.css">
@@ -64,7 +65,7 @@
             <form class="form" id="formChamado">
                 <div class="form__grupo">
                     <label class="form__rotulo" for="assunto">Assunto</label>
-                    <input class="form__campo" id="assunto" name="assunto" type="text" required>
+                    <input class="form__campo" id="assunto" name="assunto" type="text" maxlength="150" required>
                 </div>
 
                 <div class="form__grupo">
@@ -108,41 +109,50 @@
             });
         })();
 
-        document.getElementById("formChamado").addEventListener("submit", (e) => {
-    e.preventDefault();
+        document.getElementById("formChamado").addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+            const botaoEnviar = e.currentTarget.querySelector('button[type="submit"]');
+            if (botaoEnviar.disabled) return;
 
-    if (!usuario || !usuario.idUsuario) {
-        alert("Sessão expirada. Faça login novamente.");
-        window.location.href = "login.html";
-        return;
-    }
+            const usuario = JSON.parse(sessionStorage.getItem("usuario"));
 
-    fetch("/chamados/abrir", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            assuntoServer: document.getElementById("assunto").value,
-            categoriaServer: document.getElementById("categoria").value,
-            descricaoServer: document.getElementById("descricao").value,
-            idUsuarioServer: usuario.idUsuario
-        })
-    })
-        .then((resposta) => {
-            if (resposta.ok) {
+            if (!usuario || !usuario.idUsuario) {
+                alert("Sessão expirada. Faça login novamente.");
+                window.location.href = "/pages/usuario/login.html";
+                return;
+            }
+
+            botaoEnviar.disabled = true;
+
+            try {
+                const resposta = await fetch("/chamados/abrir", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        assuntoServer: document.getElementById("assunto").value,
+                        categoriaServer: document.getElementById("categoria").value,
+                        descricaoServer: document.getElementById("descricao").value,
+                        idUsuarioServer: usuario.idUsuario
+                    })
+                });
+                const dados = await resposta.json().catch(() => null);
+
+                if (!resposta.ok) {
+                    alert(dados?.mensagem || "Não foi possível enviar o chamado. Tente novamente.");
+                    console.error("Erro ao enviar chamado:", resposta.status);
+                    return;
+                }
+
                 alert("Chamado enviado com sucesso! O time de suporte entrará em contato");
                 window.location.href = "suporte.html";
-            } else {
-                alert("Não foi possível enviar o chamado. Tente novamente.");
-                console.log("Erro:", resposta.status);
+            } catch (erro) {
+                console.error("Erro ao enviar chamado:", erro);
+                alert("Erro de conexão com o servidor.");
+            } finally {
+                botaoEnviar.disabled = false;
             }
-        })
-        .catch((erro) => {
-            console.log(erro);
-            alert("Erro de conexão com o servidor.");
         });
-});
     </script>
     <script src="js/backIni/sessionStorage.js"></script>
 </body>
