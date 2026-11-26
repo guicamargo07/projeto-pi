@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class ImportadorCenso {
+
     private final LeitorArquivo<RegistroCenso> leitor;
     private final CensoDao censoDao;
     private final LogDao logDao;
@@ -14,20 +15,28 @@ public class ImportadorCenso {
         this.logDao = logDao;
     }
 
-    public void executar(int limiteRegistros, int limiteExibicao) throws IOException, SQLException {
-        System.out.println("Importando em fluxo: " + leitor.getNomeArquivo() +
-                (limiteRegistros > 0 ? " (limite de " + limiteRegistros + " registros)" : " (planilha completa)"));
+    public CensoDao.ResultadoImportacao executar(int limiteRegistros) throws IOException, SQLException {
+        logDao.registrarLog("LeitorExcel", "CONCLUIDO",
+                "Iniciando a importação do arquivo: " + leitor.getNomeArquivo(), null, null);
+
         try {
             CensoDao.ResultadoImportacao resultado = censoDao.importar(leitor, limiteRegistros);
-            String resumo = "Registros confirmados: " + resultado.totalRegistros() +
-                    "; novos nesta execução: " + resultado.novosRegistros() +
-                    "; importação completa: " + resultado.completa();
-            System.out.println(resumo);
-            logDao.registrarLog("ImportadorCenso", "CONCLUIDO", resumo, null, resultado.novosRegistros());
-        } catch (IOException | SQLException | RuntimeException e) {
-            logDao.registrarLog("ImportadorCenso", "ERRO", "Falha na importação; lotes confirmados podem ser retomados.",
-                    e.getMessage(), null);
-            throw e;
+
+            logDao.registrarLog("CensoDao", "CONCLUIDO",
+                    "Importação finalizada. Planilha completa: " + resultado.completa(),
+                    null, resultado.novosRegistros());
+
+            System.out.println("Total confirmado: " + resultado.totalRegistros()
+                    + " | Novos nesta execução: " + resultado.novosRegistros()
+                    + " | Planilha completa: " + resultado.completa());
+
+            return resultado;
+
+        } catch (IOException | SQLException e) {
+            logDao.registrarLog("CensoDao", "ERRO",
+                    "Falha na importação do censo.", e.getMessage(), null);
+            System.out.println("Erro na importação: " + e.getMessage());
+            throw e; // o Main envia o alerta ao Slack
         }
     }
 }

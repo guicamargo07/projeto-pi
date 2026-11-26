@@ -16,7 +16,7 @@ public class Conexao {
     private static final Map<String, String> CONFIGURACAO = carregarConfiguracao();
     private static final String URL = valor("MINERVA_DB_URL", montarUrl());
     private static final String USUARIO = valor("MINERVA_DB_USER", valor("DB_USER", "root"));
-    private static final String SENHA = valor("MINERVA_DB_PASSWORD", valor("DB_PASSWORD", ""));
+    private static final String SENHA = valor("MINERVA_DB_PASSWORD", valor("DB_PASSWORD", "050207gcp"));
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USUARIO, SENHA);

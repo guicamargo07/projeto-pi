@@ -19,14 +19,19 @@ public class Notificacoes {
         this.webhookUrl = webhookUrl;
     }
 
-    public void enviarNotificacao(String mensagem) throws IOException {
-        WebhookResponse response = Slack.getInstance().send(
-                webhookUrl,
-                payload(p -> p.text(mensagem))
-        );
+    public void enviarNotificacao(String mensagem) {
+        try {
+            WebhookResponse response = Slack.getInstance().send(
+                    webhookUrl,
+                    payload(p -> p.text(mensagem))
+            );
 
-        if (response.getCode() != 200) {
-            throw new IOException("Falha ao enviar para o Slack. HTTP " + response.getCode() + ": " + response.getBody());
+            if (response.getCode() != 200) {
+                System.err.println("Falha ao enviar para o Slack. HTTP "
+                        + response.getCode() + ": " + response.getBody());
+            }
+        } catch (IOException e) {
+            System.err.println("Erro de rede ao enviar para o Slack: " + e.getMessage());
         }
     }
 }

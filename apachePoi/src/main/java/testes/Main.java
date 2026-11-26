@@ -1,31 +1,48 @@
 package testes;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 public class Main {
+
+    private static final int LIMITE_REGISTROS = 1000;
+
     public static void main(String[] args) throws Exception {
         String nomeArquivo = "MICRODADOS_CURSOS_2019_2024_MINERVA.xlsx";
-        int limite = 0;
-        boolean notificarSlack = false;
-        for (String argumento : args) {
-            if (argumento.startsWith("--arquivo=")) nomeArquivo = argumento.substring("--arquivo=".length());
-            else if (argumento.startsWith("--limite=")) {
-                limite = Integer.parseInt(argumento.substring("--limite=".length()));
-                if (limite < 1) throw new IllegalArgumentException("--limite deve ser um inteiro positivo.");
-            } else if ("--notificar-slack".equals(argumento)) notificarSlack = true;
-            else throw new IllegalArgumentException("Argumento desconhecido: " + argumento);
+
+        String webhookUrl = System.getenv("SLACK_WEBHOOK_URL");
+        Notificacoes slack = new Notificacoes(webhookUrl);
+
+        try {
+            LeitorArquivo<RegistroCenso> leitor = new LeitorExcel(nomeArquivo);
+            CensoDao censoDao = new CensoDao();
+            LogDao logDao = new LogDao();
+
+            ImportadorCenso importador = new ImportadorCenso(leitor, censoDao, logDao);
+
+            long inicio = System.currentTimeMillis();
+            CensoDao.ResultadoImportacao r = importador.executar(LIMITE_REGISTROS);
+            long segundos = (System.currentTimeMillis() - inicio) / 1000;
+
+            if (r.totalRegistros() == 0) {
+                slack.enviarNotificacao("🚨 Nenhum registro importado de " + nomeArquivo
+                        + ". Arquivo vazio ou formato mudou?");
+            } else if (r.novosRegistros() == 0 && r.completa()) {
+                slack.enviarNotificacao("ℹ️ A planilha " + nomeArquivo
+                        + " já tinha sido importada integralmente. Nada foi duplicado.");
+            } else {
+                String status = r.completa()
+                        ? "✅ Importação do Censo concluída em " + segundos + "s"
+                        : "⏸️ Importação parcial do Censo (limite de " + LIMITE_REGISTROS
+                        + ") em " + segundos + "s";
+                slack.enviarNotificacao(status + "\n"
+                        + "Arquivo: " + nomeArquivo + "\n"
+                        + "Novos nesta execução: " + r.novosRegistros()
+                        + " | Total confirmado: " + r.totalRegistros());
+            }
+
+        } catch (Exception e) {
+            slack.enviarNotificacao("🚨 Falha na importação do Censo\n"
+                    + "Arquivo: " + nomeArquivo + "\n"
+                    + "Erro: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            throw e;
         }
-        Path caminho = Path.of(nomeArquivo);
-        if (!Files.isRegularFile(caminho) && !caminho.isAbsolute()) {
-            Path alternativa = Path.of("apachePoi").resolve(caminho);
-            if (Files.isRegularFile(alternativa)) caminho = alternativa;
-        }
-        if (!Files.isRegularFile(caminho)) throw new IllegalArgumentException("Planilha não encontrada: " + caminho.toAbsolutePath());
-        LeitorArquivo<RegistroCenso> leitor = new LeitorExcel(caminho.toAbsolutePath().toString());
-        ImportadorCenso importador = new ImportadorCenso(leitor, new CensoDao(), new LogDao());
-        importador.executar(limite, 0);
-        // A presença do webhook sozinha nunca autoriza uma mensagem externa.
-        if (notificarSlack) new Notificacoes(System.getenv("SLACK_WEBHOOK_URL")).enviarNotificacao("Importação do censo concluída.");
     }
 }
