@@ -1,30 +1,25 @@
 var database = require("../database/config");
 
 function abrir(titulo, descricao, categoria, idUsuario) {
-    console.log("ACESSEI O CHAMADO MODEL \n\n function abrir():", titulo, descricao, categoria, idUsuario);
-
     var instrucaoSql = `
-        INSERT INTO chamados (titulo, descricao, categoria, fkUsuario)
-        VALUES ('${titulo}', '${descricao}', '${categoria}', ${idUsuario});
+        INSERT INTO chamados (titulo, descricao, detalhe, categoria, fkUsuario)
+        VALUES (?, ?, ?, ?, ?);
     `;
 
-    console.log("Executando a instrução SQL: \n" + instrucaoSql);
-    return database.executar(instrucaoSql);
+    // O detalhe do atendimento ainda está vazio quando o usuário abre o chamado.
+    return database.executar(instrucaoSql, [titulo, descricao, "", categoria, idUsuario]);
 }
 
 function listar(idUsuario) {
-    console.log("ACESSEI O CHAMADO MODEL \n\n function listar():", idUsuario);
-
     var instrucaoSql = `
         SELECT idChamado, titulo, sts, dtAbertura
         FROM chamados
-        WHERE fkUsuario = ${idUsuario}
+        WHERE fkUsuario = ?
         ORDER BY dtAbertura DESC, idChamado DESC
         LIMIT 5;
     `;
 
-    console.log("Executando a instrução SQL: \n" + instrucaoSql);
-    return database.executar(instrucaoSql);
+    return database.executar(instrucaoSql, [idUsuario]);
 }
 
 module.exports = {
