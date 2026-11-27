@@ -1,48 +1,146 @@
 package testes;
 
+import java.util.List;
+
 public class Main {
-
     private static final int LIMITE_REGISTROS = 1000;
+    private static final int LIMITE_EXIBICAO = 10;
+    private static final int INTERVALO_LOG = 250;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         String nomeArquivo = "MICRODADOS_CURSOS_2019_2024_MINERVA.xlsx";
+        LogDao logDao = new LogDao();
 
-        String webhookUrl = System.getenv("SLACK_WEBHOOK_URL");
-        Notificacoes slack = new Notificacoes(webhookUrl);
+        logDao.registrarLog(
+                "Main",
+                "CONCLUIDO",
+                "Início do processo de carga da planilha: " + nomeArquivo,
+                "Limite de extração configurado: " + LIMITE_REGISTROS,
+                0
+        );
 
+        LeitorExcel leitorExcel = new LeitorExcel(nomeArquivo);
+        List<RegistroCenso> registrosExtraidos;
         try {
-            LeitorArquivo<RegistroCenso> leitor = new LeitorExcel(nomeArquivo);
-            CensoDao censoDao = new CensoDao();
-            LogDao logDao = new LogDao();
+            logDao.registrarLog(
+                    "LeitorExcel",
+                    "CONCLUIDO",
+                    "Iniciando extração de registros do arquivo: " + nomeArquivo,
+                    null,
+                    0
+            );
 
-            ImportadorCenso importador = new ImportadorCenso(leitor, censoDao, logDao);
+            registrosExtraidos = leitorExcel.extrairRegistros(LIMITE_REGISTROS);
 
-            long inicio = System.currentTimeMillis();
-            CensoDao.ResultadoImportacao r = importador.executar(LIMITE_REGISTROS);
-            long segundos = (System.currentTimeMillis() - inicio) / 1000;
-
-            if (r.totalRegistros() == 0) {
-                slack.enviarNotificacao("🚨 Nenhum registro importado de " + nomeArquivo
-                        + ". Arquivo vazio ou formato mudou?");
-            } else if (r.novosRegistros() == 0 && r.completa()) {
-                slack.enviarNotificacao("ℹ️ A planilha " + nomeArquivo
-                        + " já tinha sido importada integralmente. Nada foi duplicado.");
-            } else {
-                String status = r.completa()
-                        ? "✅ Importação do Censo concluída em " + segundos + "s"
-                        : "⏸️ Importação parcial do Censo (limite de " + LIMITE_REGISTROS
-                        + ") em " + segundos + "s";
-                slack.enviarNotificacao(status + "\n"
-                        + "Arquivo: " + nomeArquivo + "\n"
-                        + "Novos nesta execução: " + r.novosRegistros()
-                        + " | Total confirmado: " + r.totalRegistros());
+            int totalExtraidos = registrosExtraidos.size();
+            for (int i = INTERVALO_LOG; i <= totalExtraidos; i += INTERVALO_LOG) {
+                logDao.registrarLog(
+                        "LeitorExcel",
+                        "CONCLUIDO",
+                        "Progresso na extração da planilha (" + i + " de " + totalExtraidos + " registros)",
+                        "Arquivo: " + nomeArquivo,
+                        i
+                );
             }
 
+            logDao.registrarLog(
+                    "LeitorExcel",
+                    "CONCLUIDO",
+                    "Extração da planilha concluída",
+                    "Arquivo: " + nomeArquivo,
+                    totalExtraidos
+            );
         } catch (Exception e) {
-            slack.enviarNotificacao("🚨 Falha na importação do Censo\n"
-                    + "Arquivo: " + nomeArquivo + "\n"
-                    + "Erro: " + e.getClass().getSimpleName() + ": " + e.getMessage());
-            throw e;
+            logDao.registrarLog(
+                    "LeitorExcel",
+                    "ERRO",
+                    "Falha durante a extração do arquivo: " + nomeArquivo,
+                    e.getMessage(),
+                    0
+            );
+            System.out.println("Erro ao ler planilha: " + e.getMessage());
+            return;
+        }
+
+        System.out.println("Registros extraídos: " + registrosExtraidos.size());
+
+        int totalExibir = Math.min(LIMITE_EXIBICAO, registrosExtraidos.size());
+        System.out.println("Exibindo " + totalExibir + " de " + registrosExtraidos.size() + " registros:");
+
+        for (int i = 0; i < totalExibir; i++) {
+            System.out.println(registrosExtraidos.get(i));
+        }
+
+        int restantes = registrosExtraidos.size() - totalExibir;
+        if (restantes > 0) {
+            System.out.println("... e mais " + restantes + " registros não exibidos");
+        }
+
+        logDao.registrarLog(
+                "Main",
+                "CONCLUIDO",
+                "Pré-visualização no console concluída",
+                "Exibidos " + totalExibir + " de " + registrosExtraidos.size() + " registros",
+                totalExibir
+        );
+
+        // Grava no banco MinervaDB
+        try {
+            logDao.registrarLog(
+                    "CensoDao",
+                    "CONCLUIDO",
+                    "Iniciando persistência dos registros no banco MinervaDB",
+                    "Limite configurado: " + LIMITE_REGISTROS,
+                    registrosExtraidos.size()
+            );
+
+            CensoDao dao = new CensoDao();
+            CensoDao.ResultadoImportacao resultado = dao.importar(leitorExcel, LIMITE_REGISTROS);
+            int gravados = resultado.novosRegistros();
+
+            for (int i = INTERVALO_LOG; i <= gravados; i += INTERVALO_LOG) {
+                logDao.registrarLog(
+                        "CensoDao",
+                        "CONCLUIDO",
+                        "Lote de gravação no banco concluído (" + i + " registros acumulados)",
+                        "Tabela alvo: dadosCurso / carga Censo",
+                        i
+                );
+            }
+
+            logDao.registrarLog(
+                    "CensoDao",
+                    "CONCLUIDO",
+                    "Persistência no banco concluída com sucesso",
+                    "Arquivo: " + nomeArquivo + " | Total lidos na importação: " + resultado.totalRegistros(),
+                    gravados
+            );
+
+            logDao.registrarLog(
+                    "Main",
+                    "CONCLUIDO",
+                    "Carga finalizada com sucesso para o arquivo: " + nomeArquivo,
+                    "Extraídos: " + registrosExtraidos.size() + " | Novos gravados: " + gravados,
+                    gravados
+            );
+
+            System.out.println("Registros gravados no banco: " + gravados);
+        } catch (Exception e) {
+            logDao.registrarLog(
+                    "CensoDao",
+                    "ERRO",
+                    "Erro ao gravar registros no banco MinervaDB",
+                    e.getMessage(),
+                    0
+            );
+            logDao.registrarLog(
+                    "Main",
+                    "ERRO",
+                    "Carga abortada por falha na persistência: " + nomeArquivo,
+                    e.getMessage(),
+                    0
+            );
+            System.out.println("Erro ao gravar no banco: " + e.getMessage());
         }
     }
 }
