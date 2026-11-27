@@ -193,3 +193,22 @@ CREATE TABLE logs (
     qtdRegistros INT,                              -- quantos registros foram lidos/gravados
     CONSTRAINT chk_logs_sts CHECK (sts IN ('ERRO', 'CONCLUIDO'))
 );
+
+-- ---------------------------------------------------------------------
+-- NOTIFICAÇÕES ENVIADAS AO SLACK
+-- Guarda o histórico dos alertas relacionados aos registros da tabela logs.
+-- A URL secreta do Slack Webhook deve ficar nas variáveis de ambiente,
+-- e não nesta tabela.
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS notificacoesSlack (
+    idNotificacaoSlack INT PRIMARY KEY AUTO_INCREMENT,
+    mensagem TEXT NOT NULL,
+    sts ENUM('PENDENTE', 'ENVIADA', 'ERRO') NOT NULL DEFAULT 'PENDENTE',
+    dtCriacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    dtEnvio DATETIME DEFAULT NULL,
+    detalheErro TEXT DEFAULT NULL,
+    fkLog INT NOT NULL,
+
+    CONSTRAINT fk_notificacoes_slack_logs
+        FOREIGN KEY (fkLog) REFERENCES logs(idLog)
+);
